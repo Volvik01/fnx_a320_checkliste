@@ -494,6 +494,26 @@
             <div class="toggle-slider"></div>
           </label>
         </div>
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">FL100 Callout – Steigflug</div>
+            <div class="setting-sub">"Ten thousand feet, lights off"</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="tog-callout-climb" onchange="saveSettings()">
+            <div class="toggle-slider"></div>
+          </label>
+        </div>
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">FL100 Callout – Sinkflug</div>
+            <div class="setting-sub">"Ten thousand feet, lights on"</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="tog-callout-descent" onchange="saveSettings()">
+            <div class="toggle-slider"></div>
+          </label>
+        </div>
 
         <div class="setting-row">
           <div>
@@ -1469,6 +1489,8 @@ function scrollTabs(dir) {
 let settings = {
   climbWarn: false,
   descentWarn: false,
+  calloutClimb: false,
+  calloutDescent: false,
   autoClose: false,
   autoConnect: true,
   sound: false,
@@ -1503,8 +1525,10 @@ function closeSettings() {
   document.getElementById('settings-overlay').classList.remove('open');
 }
 function saveSettings() {
-  settings.climbWarn   = document.getElementById('tog-climb').checked;
-  settings.descentWarn = document.getElementById('tog-descent').checked;
+  settings.climbWarn      = document.getElementById('tog-climb').checked;
+  settings.descentWarn    = document.getElementById('tog-descent').checked;
+  settings.calloutClimb   = document.getElementById('tog-callout-climb').checked;
+  settings.calloutDescent = document.getElementById('tog-callout-descent').checked;
   settings.autoClose   = document.getElementById('tog-autoclose').checked;
   settings.autoConnect = document.getElementById('tog-autoconnect').checked;
   settings.sound       = document.getElementById('tog-sound').checked;
@@ -1526,8 +1550,10 @@ function loadSettings() {
     const s = JSON.parse(localStorage.getItem('fenix-settings') || '{}');
     settings = { ...settings, ...s };
   } catch(e) {}
-  document.getElementById('tog-climb').checked      = settings.climbWarn;
-  document.getElementById('tog-descent').checked    = settings.descentWarn;
+  document.getElementById('tog-climb').checked           = settings.climbWarn;
+  document.getElementById('tog-descent').checked         = settings.descentWarn;
+  document.getElementById('tog-callout-climb').checked   = settings.calloutClimb ?? false;
+  document.getElementById('tog-callout-descent').checked = settings.calloutDescent ?? false;
   document.getElementById('tog-autoclose').checked  = settings.autoClose;
   document.getElementById('tog-autoconnect').checked= settings.autoConnect;
   document.getElementById('tog-sound').checked      = settings.sound;
@@ -1759,6 +1785,7 @@ function checkAltitudeWarning() {
       warn.className = 'climb';
       warn.innerHTML = `↑ ${bucket.toLocaleString()} ft – LANDING LIGHTS OFF · NOSE OFF`;
       playChime('climb');
+      if (settings.calloutClimb) calloutSpeak('Ten thousand feet, lights off');
       startAutoClose();
     }
   }
@@ -1769,6 +1796,7 @@ function checkAltitudeWarning() {
       warn.className = 'descent';
       warn.innerHTML = `↓ ${bucket.toLocaleString()} ft – LANDING LIGHTS ON · NOSE ON`;
       playChime('descent');
+      if (settings.calloutDescent) calloutSpeak('Ten thousand feet, lights on');
       startAutoClose();
     }
   }
