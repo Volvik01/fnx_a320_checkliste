@@ -1,0 +1,15 @@
+{
+  "name": "fenix-a320-checklist",
+  "version": "1.0.0",
+  "description": "Fenix A320 Checkliste - Overlay App für MSFS 2024",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "devDependencies": {
+    "electron": "^28.0.0"
+  },
+  "dependencies": {
+    "node-simconnect": "^4.2.0"
+  }
+}

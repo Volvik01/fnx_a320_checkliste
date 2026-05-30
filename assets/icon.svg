@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <rect width="256" height="256" rx="52" fill="#0a0c0f"/>
+  <rect x="2" y="2" width="252" height="252" rx="50" fill="none" stroke="#00b4d8" stroke-width="3"/>
+  <!-- Clipboard -->
+  <rect x="58" y="52" width="140" height="158" rx="12" fill="#111419" stroke="#1e2530" stroke-width="2"/>
+  <!-- Clip -->
+  <rect x="98" y="38" width="60" height="26" rx="9" fill="#00b4d8"/>
+  <rect x="110" y="44" width="36" height="14" rx="5" fill="#0a0c0f"/>
+  <!-- Row 1 -->
+  <rect x="74" y="96" width="22" height="22" rx="5" fill="none" stroke="#1e2530" stroke-width="2"/>
+  <polyline points="78,107 84,114 96,99" fill="none" stroke="#22c55e" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <line x1="108" y1="107" x2="182" y2="107" stroke="#2a3545" stroke-width="3" stroke-linecap="round"/>
+  <!-- Row 2 -->
+  <rect x="74" y="132" width="22" height="22" rx="5" fill="none" stroke="#1e2530" stroke-width="2"/>
+  <polyline points="78,143 84,150 96,135" fill="none" stroke="#22c55e" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <line x1="108" y1="143" x2="182" y2="143" stroke="#2a3545" stroke-width="3" stroke-linecap="round"/>
+  <!-- Row 3 - offen/amber -->
+  <rect x="74" y="168" width="22" height="22" rx="5" fill="none" stroke="#2a3545" stroke-width="2"/>
+  <line x1="108" y1="179" x2="165" y2="179" stroke="#2a3545" stroke-width="3" stroke-linecap="round"/>
+</svg>

@@ -1,0 +1,12 @@
+{
+  "name": "fenix-lvar-bridge",
+  "version": "1.0.0",
+  "main": "bridge.js",
+  "scripts": { "start": "node bridge.js" },
+  "dependencies": {
+    "ws": "^8.0.0",
+    "node-simconnect": "*",
+    "fsuipc": "^0.7.3",
+    "fsuipc-wasm": "*"
+  }
+}

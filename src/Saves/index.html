@@ -1,0 +1,1871 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fenix A320 – Checkliste</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Barlow:wght@300;400;500;600&display=swap');
+
+  :root {
+    --bg:        #0a0c0f;
+    --bg2:       #111419;
+    --bg3:       #181c23;
+    --border:    #1e2530;
+    --accent:    #00b4d8;
+    --accent2:   #0077a8;
+    --green:     #22c55e;
+    --amber:     #f59e0b;
+    --red:       #ef4444;
+    --text:      #c8d6e5;
+    --text-dim:  #5a6a7e;
+    --mono:      'Share Tech Mono', monospace;
+    --sans:      'Barlow', sans-serif;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    background: transparent;
+    font-family: var(--sans);
+    color: var(--text);
+    user-select: none;
+    overflow: hidden;
+  }
+
+  #app {
+    width: 420px;
+    height: 780px;
+    background: rgba(10,12,15,0.97);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 32px 80px rgba(0,0,0,0.8), 0 0 0 1px rgba(0,180,216,0.08);
+  }
+
+  /* Titelleiste */
+  #titlebar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    cursor: move;
+    -webkit-app-region: no-drag;
+    flex-shrink: 0;
+  }
+  #titlebar-logo { font-family: var(--mono); font-size: 11px; color: var(--accent); letter-spacing: 2px; }
+  #titlebar-sub  { font-size: 10px; color: var(--text-dim); letter-spacing: 1px; flex: 1; }
+  #titlebar-btns { display: flex; gap: 6px; -webkit-app-region: no-drag; }
+  .tbar-btn {
+    width:22px; height:22px; border-radius:50%; border:none; cursor:pointer;
+    font-size:12px; display:flex; align-items:center; justify-content:center; transition:opacity .15s;
+  }
+  .tbar-btn:hover { opacity:.7; }
+  #btn-collapse { background: var(--amber); color:#000; font-size:9px; }
+  #btn-close    { background: var(--red);   color:#fff; }
+  #app.collapsed { height: 42px !important; }
+  #app.collapsed #debug-bar,
+  #app.collapsed #lvar-status-bar,
+  #app.collapsed #phase-tabs,
+  #app.collapsed #progress-bar-wrap,
+  #app.collapsed #complete-banner,
+  #app.collapsed #checklist-wrap,
+  #app.collapsed #footer { display: none !important; }
+  #app { transition: height 0.25s cubic-bezier(0.4,0,0.2,1); }
+
+  /* ─── Tablet / Browser Modus ─── */
+  @media screen and (min-width: 500px) {
+    body {
+      background: #0a0c0f;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      padding: 20px;
+      box-sizing: border-box;
+      overflow-y: auto;
+    }
+    #app {
+      width: 100%;
+      max-width: 600px;
+      height: auto !important;
+      min-height: 600px;
+      border-radius: 12px;
+      position: relative;
+    }
+    #checklist-wrap {
+      max-height: none !important;
+      overflow-y: visible !important;
+    }
+  }
+
+  /* Phasen-Tabs */
+  #phase-tabs-wrap {
+    display: flex;
+    align-items: center;
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+  .tabs-arrow {
+    width: 22px; min-width: 22px; height: 100%;
+    background: none; border: none; color: var(--text-dim);
+    cursor: pointer; font-size: 12px; padding: 0;
+    display: flex; align-items: center; justify-content: center;
+    transition: color .15s;
+    flex-shrink: 0;
+  }
+  .tabs-arrow:hover { color: var(--accent); }
+  #phase-tabs {
+    display: flex;
+    overflow-x: auto;
+    flex: 1;
+    scrollbar-width: none;
+    scroll-behavior: smooth;
+  }
+  #phase-tabs::-webkit-scrollbar { display:none; }
+
+  .phase-tab {
+    flex:1; padding:8px 4px;
+    font-family: var(--mono); font-size:8.5px; letter-spacing:.5px;
+    color: var(--text-dim);
+    background:none; border:none; border-bottom:2px solid transparent;
+    cursor:pointer; text-align:center; transition:all .2s;
+    white-space:nowrap; min-width:56px;
+  }
+  .phase-tab:hover { color:var(--text); }
+  .phase-tab.active { color:var(--accent); border-bottom-color:var(--accent); }
+  .phase-tab .tab-prog { display:block; font-size:7.5px; margin-top:2px; color:var(--text-dim); }
+  .phase-tab.complete .tab-prog { color:var(--green); }
+
+  /* Fortschritt */
+  #progress-bar-wrap { padding:10px 14px 6px; flex-shrink:0; }
+  #progress-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; }
+  #progress-label { font-family:var(--mono); font-size:10px; color:var(--text-dim); letter-spacing:1px; }
+  #progress-count { font-family:var(--mono); font-size:11px; color:var(--accent); }
+  #progress-bar   { height:3px; background:var(--border); border-radius:2px; overflow:hidden; }
+  #progress-fill  {
+    height:100%; background:linear-gradient(90deg,var(--accent2),var(--accent));
+    border-radius:2px; transition:width .4s cubic-bezier(.4,0,.2,1); width:0%;
+  }
+
+  /* Checkliste */
+  #checklist-wrap {
+    flex:1; overflow-y:auto; padding:6px 10px 12px;
+    scrollbar-width:thin; scrollbar-color:var(--border) transparent;
+  }
+  #checklist-wrap::-webkit-scrollbar { width:4px; }
+  #checklist-wrap::-webkit-scrollbar-thumb { background:var(--border); border-radius:2px; }
+
+  .section-header {
+    font-family:var(--mono); font-size:9px; letter-spacing:2px; color:var(--text-dim);
+    text-transform:uppercase; padding:10px 4px 4px;
+    border-bottom:1px solid var(--border); margin-bottom:2px;
+  }
+
+  .checklist-item {
+    display:flex; align-items:center; gap:10px;
+    padding:7px 6px; border-radius:6px; cursor:pointer;
+    transition:background .15s; border-bottom:1px solid rgba(30,37,48,.5);
+  }
+  .checklist-item:hover { background:rgba(255,255,255,.03); }
+  .checklist-item:last-child { border-bottom:none; }
+
+  .item-checkbox {
+    width:18px; height:18px; border:1.5px solid var(--text-dim); border-radius:4px;
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink:0; transition:all .2s; font-size:11px;
+  }
+  .checklist-item.done .item-checkbox {
+    background:var(--green); border-color:var(--green); color:#000;
+  }
+  .checklist-item.done .item-checkbox::after { content:'✓'; }
+  .checklist-item.auto-done .item-checkbox {
+    background:var(--accent); border-color:var(--accent); color:#000;
+  }
+  .checklist-item.auto-done .item-checkbox::after { content:'✓'; }
+
+  .item-content { flex:1; min-width:0; }
+  .item-action {
+    font-size:12.5px; font-weight:500; color:var(--text);
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis; transition:color .2s;
+  }
+  .item-value { font-family:var(--mono); font-size:9.5px; color:var(--text-dim); margin-top:1px; letter-spacing:.5px; }
+
+  .checklist-item.done .item-action,
+  .checklist-item.auto-done .item-action {
+    color:var(--text-dim);
+    text-decoration:line-through; text-decoration-color:rgba(90,106,126,.5);
+  }
+
+  /* L-VAR Badge */
+  .lvar-badge {
+    font-family:var(--mono); font-size:7.5px; padding:2px 5px; border-radius:3px;
+    background:rgba(0,119,168,.2); border:1px solid rgba(0,180,216,.25);
+    color:var(--accent); letter-spacing:.5px; flex-shrink:0; white-space:nowrap;
+    cursor:help;
+  }
+  /* L-VAR Status-Anzeige */
+  #lvar-status-bar {
+    display:flex; align-items:center; gap:6px;
+    padding:4px 14px; background:var(--bg2); border-bottom:1px solid var(--border);
+    flex-shrink:0;
+  }
+  #lvar-dot { width:6px; height:6px; border-radius:50%; background:var(--text-dim); flex-shrink:0; }
+  #lvar-dot.connected { background:var(--green); box-shadow:0 0 6px var(--green); animation:pulse 2s infinite; }
+  #lvar-dot.error { background:var(--red); }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.5} }
+  #lvar-status-text { font-family:var(--mono); font-size:8.5px; color:var(--text-dim); flex:1; letter-spacing:.5px; }
+  #lvar-connect-btn {
+    font-family:var(--mono); font-size:8px; letter-spacing:.5px;
+    color:var(--accent); background:none; border:1px solid rgba(0,180,216,.3);
+    border-radius:3px; padding:2px 7px; cursor:pointer; transition:all .2s;
+  }
+  #lvar-connect-btn:hover { background:rgba(0,180,216,.1); }
+
+  /* Settings Panel */
+  #settings-overlay {
+    display: none;
+    position: absolute; top:0; left:0; right:0; bottom:0;
+    background: rgba(10,12,15,0.97);
+    z-index: 100; flex-direction: column;
+    border-radius: 12px; overflow: hidden;
+  }
+  #settings-overlay.open { display: flex; }
+  #settings-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 16px; background: var(--bg2);
+    border-bottom: 1px solid var(--border); flex-shrink:0;
+  }
+  #settings-title { font-family: var(--mono); font-size: 11px; color: var(--accent); letter-spacing: 2px; }
+  #settings-close {
+    background: var(--red); border: none; color: #fff;
+    width:22px; height:22px; border-radius:50%; cursor:pointer; font-size:12px;
+  }
+  #settings-body { flex:1; overflow-y:auto; padding: 16px; }
+  .setting-group {
+    margin-bottom: 20px; padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .setting-group:last-child { border-bottom: none; }
+  .setting-group-title {
+    font-family: var(--mono); font-size: 9px; color: var(--text-dim);
+    letter-spacing: 2px; text-transform: uppercase; margin-bottom: 12px;
+  }
+  .setting-row {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 10px; gap: 12px;
+  }
+  .setting-label { font-size: 12px; color: var(--text); flex:1; }
+  .setting-sub { font-size: 10px; color: var(--text-dim); margin-top: 2px; }
+  .toggle-switch {
+    position: relative; width: 36px; height: 20px; flex-shrink:0;
+  }
+  .toggle-switch input { display:none; }
+  .toggle-slider {
+    position: absolute; inset:0; background: var(--border);
+    border-radius: 20px; cursor: pointer; transition: background .2s;
+  }
+  .toggle-slider::after {
+    content:''; position:absolute; width:14px; height:14px;
+    background:#fff; border-radius:50%; top:3px; left:3px; transition: transform .2s;
+  }
+  .toggle-switch input:checked + .toggle-slider { background: var(--accent); }
+  .toggle-switch input:checked + .toggle-slider::after { transform: translateX(16px); }
+
+  /* Altitude Warning Banner */
+  #alt-warning {
+    display: none; margin: 0 10px 6px;
+    padding: 8px 14px;
+    border-radius: 8px; font-family: var(--mono); font-size: 10px;
+    letter-spacing: 1px; text-align: center;
+    animation: flashWarn 1s infinite;
+    flex-shrink: 0;
+  }
+  #alt-warning.climb {
+    display: block;
+    background: rgba(245,158,11,0.12);
+    border: 1px solid rgba(245,158,11,0.5);
+    color: var(--amber);
+  }
+  #alt-warning.descent {
+    display: block;
+    background: rgba(0,180,216,0.10);
+    border: 1px solid rgba(0,180,216,0.4);
+    color: var(--accent);
+  }
+  @keyframes flashWarn {
+    0%,100%{ opacity:1; } 50%{ opacity:0.5; }
+  }
+
+  /* CHR Banner */
+  #chr-banner {
+    display: none; margin: 0 10px 6px;
+    padding: 6px 14px;
+    border-radius: 8px; font-family: var(--mono); font-size: 10px;
+    letter-spacing: 1px; text-align: center;
+    flex-shrink: 0; transition: opacity 0.5s;
+  }
+  #chr-banner.chr-start {
+    display: block;
+    background: rgba(34,197,94,0.10);
+    border: 1px solid rgba(34,197,94,0.5);
+    color: var(--green);
+    animation: flashWarn 1s 3;
+  }
+  #chr-banner.chr-stop {
+    display: block;
+    background: rgba(239,68,68,0.10);
+    border: 1px solid rgba(239,68,68,0.4);
+    color: var(--red);
+    animation: flashWarn 1s 3;
+  }
+
+  #btn-reset-all {
+    font-family: var(--mono); font-size: 9px; letter-spacing: 1px;
+    color: var(--red); background: none;
+    border: 1px solid var(--red); border-radius: 4px;
+    padding: 5px 12px; cursor: pointer; transition: all .2s; flex-shrink:0;
+  }
+  #btn-reset-all:hover { background: rgba(239,68,68,0.1); }
+
+  /* Shortcut Recorder */
+  .shortcut-box {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 5px 12px;
+    cursor: pointer;
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--accent);
+    min-width: 130px;
+    text-align: center;
+    user-select: none;
+    outline: none;
+    transition: border-color .2s;
+    white-space: nowrap;
+  }
+  .shortcut-box:hover { border-color: var(--accent2); }
+  .shortcut-box.recording {
+    border-color: var(--accent);
+    color: var(--amber);
+    animation: pulse-sc 0.7s infinite;
+  }
+  @keyframes pulse-sc {
+    0%, 100% { border-color: var(--accent); }
+    50%       { border-color: var(--border); }
+  }
+
+  /* Settings Button in Titlebar */
+  #btn-settings {
+    background: var(--bg3); border: 1px solid var(--border);
+    color: var(--text-dim); width:22px; height:22px;
+    border-radius:50%; cursor:pointer; font-size:11px;
+    display:flex; align-items:center; justify-content:center;
+    transition: all .15s;
+  }
+  #btn-settings:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* Vref Rechner */
+  .vref-box {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 10px 12px; margin: 6px 0 2px;
+  }
+  .vref-title {
+    font-family: var(--mono); font-size: 9px; color: var(--accent);
+    letter-spacing: 2px; margin-bottom: 8px;
+  }
+  .vref-weight-row {
+    display: flex; align-items: center; gap: 8px; margin-bottom: 10px;
+  }
+  .vref-weight-label { font-size: 11px; color: var(--text-dim); flex:1; }
+  .vref-weight-input {
+    width: 70px; background: var(--bg3); border: 1px solid var(--border);
+    border-radius: 4px; color: var(--accent); font-family: var(--mono);
+    font-size: 12px; padding: 4px 8px; text-align: right;
+    outline: none;
+  }
+  .vref-weight-input:focus { border-color: var(--accent); }
+  .vref-weight-unit { font-family: var(--mono); font-size: 10px; color: var(--text-dim); }
+  .vref-speeds {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 4px;
+  }
+  .vref-speed-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 4px 8px; background: var(--bg3); border-radius: 4px;
+    border: 1px solid var(--border);
+  }
+  .vref-speed-label { font-size: 10px; color: var(--text-dim); }
+  .vref-speed-val {
+    font-family: var(--mono); font-size: 13px; font-weight: bold;
+    color: var(--accent);
+  }
+  .vref-speed-row.vapp .vref-speed-val { color: #22c55e; font-size: 14px; }
+
+  /* Callout Banner */
+  #callout-banner {
+    display: none; margin: 0 10px 4px;
+    padding: 5px 14px;
+    border-radius: 6px; font-family: var(--mono); font-size: 12px;
+    letter-spacing: 2px; text-align: center; font-weight: bold;
+    flex-shrink: 0;
+    background: rgba(0,180,216,0.12);
+    border: 1px solid rgba(0,180,216,0.4);
+    color: var(--accent);
+    animation: calloutFade 3s forwards;
+  }
+  @keyframes calloutFade {
+    0%   { opacity:1; }
+    70%  { opacity:1; }
+    100% { opacity:0; }
+  }
+
+  /* Abschluss-Banner */
+  #complete-banner {
+    display:none; margin:8px 10px; padding:10px 14px;
+    background:rgba(34,197,94,.08); border:1px solid rgba(34,197,94,.3);
+    border-radius:8px; font-family:var(--mono); font-size:10px;
+    color:var(--green); letter-spacing:1px; text-align:center;
+    animation:fadeIn .4s ease;
+  }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:none} }
+
+  /* Footer */
+  #footer {
+    padding:8px 14px; background:var(--bg2); border-top:1px solid var(--border);
+    display:flex; align-items:center; justify-content:space-between; flex-shrink:0;
+  }
+  #footer-info { font-family:var(--mono); font-size:8.5px; color:var(--text-dim); letter-spacing:.5px; }
+  #btn-reset {
+    font-family:var(--mono); font-size:9px; letter-spacing:1px;
+    color:var(--text-dim); background:none; border:1px solid var(--border);
+    border-radius:4px; padding:4px 10px; cursor:pointer; transition:all .2s;
+  }
+  #btn-reset:hover { border-color:var(--red); color:var(--red); }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <div id="titlebar" onmousedown="startDrag(event)">
+    <span id="titlebar-logo">FENIX A320</span>
+    <span id="titlebar-sub">NORMAL CHECKLIST</span>
+    <div id="titlebar-btns">
+      <button id="btn-settings" title="Einstellungen" onclick="openSettings()">⚙</button>
+      <button class="tbar-btn" id="btn-collapse" title="Einklappen" onclick="toggleCollapse()">▲</button>
+      <button class="tbar-btn" id="btn-close" onclick="window.electronAPI.close()">×</button>
+    </div>
+  </div>
+
+  <!-- Settings Overlay -->
+  <div id="settings-overlay">
+    <div id="settings-header">
+      <span id="settings-title">⚙ EINSTELLUNGEN</span>
+      <button id="settings-close" onclick="closeSettings()">×</button>
+    </div>
+    <div id="settings-body">
+      <div class="setting-group">
+        <div class="setting-group-title">HÖHENWARNUNGEN</div>
+
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">FL100 Warnung – Steigflug</div>
+            <div class="setting-sub">Warnung bei 9.600 ft ↑ (Lichter aus)</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="tog-climb" onchange="saveSettings()">
+            <div class="toggle-slider"></div>
+          </label>
+        </div>
+
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">FL100 Warnung – Sinkflug</div>
+            <div class="setting-sub">Warnung bei 10.400 ft ↓ (Lichter an)</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="tog-descent" onchange="saveSettings()">
+            <div class="toggle-slider"></div>
+          </label>
+        </div>
+
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">Warnung automatisch schließen</div>
+            <div class="setting-sub">Nach 30 Sekunden ausblenden</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="tog-autoclose" onchange="saveSettings()">
+            <div class="toggle-slider"></div>
+          </label>
+        </div>
+
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">Ton bei FL100 Warnung</div>
+            <div class="setting-sub">Cockpit-Chime beim Erreichen von FL100</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="tog-sound" onchange="saveSettings()">
+            <div class="toggle-slider"></div>
+          </label>
+        </div>
+      </div>
+
+      <div class="setting-group">
+        <div class="setting-group-title">ALLGEMEIN</div>
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">Auto-Verbinden beim Start</div>
+            <div class="setting-sub">Bridge automatisch verbinden</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="tog-autoconnect" checked onchange="saveSettings()">
+            <div class="toggle-slider"></div>
+          </label>
+        </div>
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">Auto-Weiterschalten</div>
+            <div class="setting-sub">Bei Abschluss zur nächsten Phase</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="tog-autonext" onchange="saveSettings()">
+            <div class="toggle-slider"></div>
+          </label>
+        </div>
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">CHR Auto-Start/-Stopp</div>
+            <div class="setting-sub">Startet CHR bei 10ft RA, Stopp bei Touchdown</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="tog-chr" onchange="saveSettings()">
+            <div class="toggle-slider"></div>
+          </label>
+        </div>
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">Tablet-Zugriff URL</div>
+            <div class="setting-sub">Im Browser des Tablets öffnen</div>
+          </div>
+          <div id="tablet-url" style="font-family:var(--mono);font-size:11px;color:var(--accent);padding:4px 8px;background:var(--bg3);border-radius:6px;border:1px solid var(--border);">
+            Nicht verbunden
+          </div>
+        </div>
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">Fenster ein/ausblenden</div>
+            <div class="setting-sub">Tastenkürzel zum Togglen über dem Sim</div>
+          </div>
+          <div id="shortcut-recorder" class="shortcut-box" tabindex="0"
+               onclick="startShortcutRecording()" title="Klicken, dann Tasten drücken">
+            <span id="shortcut-display">Ctrl+Shift+C</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="setting-group">
+        <div class="setting-group-title">CALLOUTS</div>
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">Callouts aktivieren</div>
+            <div class="setting-sub">Airbus Callouts via Text-to-Speech</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="tog-callouts" onchange="saveSettings()">
+            <div class="toggle-slider"></div>
+          </label>
+        </div>
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">V1 Geschwindigkeit</div>
+            <div class="setting-sub">Takeoff Decision Speed</div>
+          </div>
+          <input type="number" id="inp-v1" min="100" max="200" value="145"
+            onchange="saveSettings()"
+            style="width:60px;background:var(--bg3);border:1px solid var(--border);
+                   border-radius:4px;color:var(--accent);font-family:var(--mono);
+                   font-size:12px;padding:3px 6px;text-align:right;outline:none;">
+        </div>
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">VR Geschwindigkeit</div>
+            <div class="setting-sub">Rotation Speed</div>
+          </div>
+          <input type="number" id="inp-vr" min="100" max="220" value="150"
+            onchange="saveSettings()"
+            style="width:60px;background:var(--bg3);border:1px solid var(--border);
+                   border-radius:4px;color:var(--accent);font-family:var(--mono);
+                   font-size:12px;padding:3px 6px;text-align:right;outline:none;">
+        </div>
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">Callout Stimme</div>
+            <div class="setting-sub">Sprache für Text-to-Speech</div>
+          </div>
+          <select id="sel-voice" onchange="saveSettings()"
+            style="background:var(--bg3);border:1px solid var(--border);
+                   border-radius:4px;color:var(--accent);font-family:var(--mono);
+                   font-size:10px;padding:3px 6px;outline:none;">
+            <option value="en-US">English (US)</option>
+            <option value="en-GB">English (GB)</option>
+            <option value="de-DE">Deutsch</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="setting-group">
+        <div class="setting-group-title">RESET</div>
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">Gesamte Checkliste zurücksetzen</div>
+            <div class="setting-sub">Alle Phasen und Items auf Anfang</div>
+          </div>
+          <button id="btn-reset-all" onclick="resetAllChecklists()">RESET ALL</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Altitude Warning -->
+  <div id="alt-warning"></div>
+  <div id="chr-banner"></div>
+  <div id="callout-banner"></div>
+
+  <!-- L-VAR Verbindungsstatus -->
+  <div id="lvar-status-bar">
+    <div id="lvar-dot"></div>
+    <span id="lvar-status-text">L-VARs: NICHT VERBUNDEN</span>
+    <button id="lvar-connect-btn" onclick="connectLVars()">VERBINDEN</button>
+  </div>
+
+  <div id="phase-tabs-wrap">
+    <button class="tabs-arrow" id="tabs-left" onclick="scrollTabs(-1)">&#8249;</button>
+    <div id="phase-tabs"></div>
+    <button class="tabs-arrow" id="tabs-right" onclick="scrollTabs(1)">&#8250;</button>
+  </div>
+
+  <div id="progress-bar-wrap">
+    <div id="progress-header">
+      <span id="progress-label">PHASE PROGRESS</span>
+      <span id="progress-count">0 / 0</span>
+    </div>
+    <div id="progress-bar"><div id="progress-fill"></div></div>
+  </div>
+
+  <div id="complete-banner">✓ CHECKLIST COMPLETE – READY FOR NEXT PHASE</div>
+  <div id="checklist-wrap"></div>
+
+  <div id="footer">
+    <div id="footer-info">FENIX A320 · ECHTE L-VARs</div>
+    <button id="btn-reset">RESET PHASE</button>
+  </div>
+
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// FENIX A320 CHECKLISTE – MIT ECHTEN L-VARs AUS XML
+// Alle L-VAR Namen direkt aus fnx320_L-VARs.xml
+// ═══════════════════════════════════════════════════════
+
+const CHECKLISTS = [
+  {
+    id: 'cockpit-prep-1', label: 'COCKPIT\nPREP', name: 'COCKPIT PREPARATION I',
+    sections: [{
+      title: 'OVERHEAD & SYSTEMS',
+      items: [
+        { id:'atis',      action:'ATIS',                    value:'ByondATC',        lvar:null },
+        { id:'bat12',     action:'Battery 1 & 2',           value:'ON',              lvar:'S_OH_ELEC_BAT2', lval:1 },
+        { id:'extpwr',    action:'External Power',          value:'AS REQ / ON',     lvar:'I_OH_ELEC_EXT_PWR_U', lval:0 },
+        { id:'nav-logo',  action:'Nav & Logo Lights',       value:'ON',              lvar:'A_LT_NAV', lval:1 },
+        { id:'no-smk',    action:'No Smoking',              value:'AUTO',            lvar:'S_OH_SIGNS_SMOKING', lval:1 },
+        { id:'emer-lt',   action:'Emergency Exit Lights',   value:'ARM',             lvar:'S_OH_INT_LT_EMER', lval:1 },
+        { id:'oxygen',    action:'Oxygen Crew Supply',      value:'ON',              lvar:'S_OH_OXYGEN_CREW_OXYGEN', lval:1 },
+        { id:'rcrd-gnd',  action:'Recorder GND CTL',        value:'ON',              lvar:'I_OH_RCRD_GND_CTL_L', lval:1 },
+        { id:'adirs',     action:'ADIRS 1-3-2',             value:'NAV',             lvar:'S_OH_NAV_IR3_MODE', lval:1 },
+        { id:'fuel-pumps',action:'Fuel Pumps',              value:'ON',              lvar:'S_OH_FUEL_RIGHT_2', lval:1 },
+        { id:'apu-mstr',  action:'APU Master',              value:'ON',              lvar:'I_OH_ELEC_APU_MASTER_L', lval:1 },
+        { id:'apu-start', action:'APU START (nach 3 Sek)',  value:'ON',              lvar:null },
+        { id:'apu-avail', action:'APU AVAIL',               value:'WARTEN',          lvar:null },
+        { id:'extpwr-off',action:'External Power',          value:'OFF',             lvar:'I_OH_ELEC_EXT_PWR_U', lval:1 },
+        { id:'apu-bleed', action:'APU Bleed',               value:'ON',              lvar:'S_OH_PNEUMATIC_APU_BLEED', lval:1 },
+        { id:'ovhd-check',action:'Overhead Panel CHECK',    value:'KEINE WEISSEN LT',lvar:null },
+      ]
+    }]
+  },
+  {
+    id: 'mcdu-pushback', label: 'MCDU', name: 'MCDU SETUP & PUSHBACK',
+    sections: [{
+      title: 'SETUP & PUSHBACK',
+      items: [
+        { id:'atc-clear', action:'ATC Clearance IFR',       value:'ByondATC',        lvar:null },
+        { id:'gsx-open',  action:'Ingamepanel GSX',         value:'ÖFFNEN',          lvar:null },
+        { id:'efb-fp',    action:'EFB',                     value:'Flightplan / GSX',lvar:null },
+        { id:'mcdu-prog', action:'MCDU',                    value:'PROGRAMMIEREN',   lvar:null },
+        { id:'efb-init',  action:'EFB INT',                 value:'SENDEN',          lvar:null },
+        { id:'efb-perf',  action:'EFB Performance',         value:'SENDEN',          lvar:null },
+        { id:'seatbelt1', action:'Seat Belt Signs',         value:'ON',              lvar:'A_SEATBELTS', lval:1 },
+        { id:'beacon1',   action:'BEACON',                  value:'ON',              lvar:'A_LT_BEACON', lval:1 },
+      ]
+    }]
+  },
+  {
+    id: 'before-start', label: 'BEFORE\nSTART', name: 'BEFORE START',
+    sections: [{
+      title: 'FCU & SYSTEMS',
+      items: [
+        { id:'baro-ref',  action:'Altimeter Baro Ref',      value:'SET',             lvar:null },
+        //{ id:'fd-btn',    action:'FD Button CHECK',         value:'ON',              lvar:'I_FCU_EFIS1_FD', lval:1 },
+        { id:'fd-btn',    action:'FD Button CHECK',         value:'ON',              lvar:'I_FCU_EFIS1_FD', lval:1, noAutoOnStart: true },
+        { id:'fcu-spd',   action:'FCU SPD',                 value:'CHECK DASHED',    lvar:'B_FCU_SPEED_DASHED', lval:1, noAutoOnStart: true },
+        { id:'fcu-hdg',   action:'FCU HDG',                 value:'CHECK DASHED',    lvar:'B_FCU_HEADING_DASHED', lval:1, noAutoOnStart: true },
+        { id:'fcu-alt',   action:'FCU ALT SEL',             value:'SET ALTITUDE',    lvar:null },
+        { id:'thr-idle',  action:'Thrust Levers',           value:'IDLE',            lvar:'A_FC_THROTTLE_LEFT_INPUT', lval:2, noAutoOnStart: true, lvar2:'A_FC_THROTTLE_RIGHT_INPUT', lval2:2, noAutoOnStart: true },
+        { id:'pws',       action:'Pred. Windshear PWS',     value:'OFF',             lvar:'S_WR_PRED_WS', lval:0 },
+        { id:'wx-on',     action:'Weather Radar',           value:'OFF',             lvar:'S_WR_SYS', lval:1 },
+		    // My S_XPDR_OPERATION = 1 ist: Auto
+		    { id:'xpdr-AUTO', action:'Transponder Opt / AUTO',  value:'SET / AUTO',      lvar:'S_XPDR_OPERATION', lval:1 },
+        { id:'xpdr-stby', action:'Transponder / TCAS',      value:'SET / STBY',      lvar:'S_XPDR_MODE', lval:0 },
+        { id:'atc-push',  action:'ATC Pushback & Startup',  value:'ByondATC',        lvar:null },
+        //{ id:'beacon2',   action:'BEACON',                  value:'ON',              lvar:'A_LT_BEACON', lval:1 },
+      ]
+    }]
+  },
+  {
+    id: 'eng-start', label: 'ENGINE\nSTART', name: 'ENGINE START',
+    sections: [{
+      title: 'START SEQUENCE',
+      items: [
+        { id:'park-brk',  action:'PARKING BRAKE',           value:'SET',             lvar:'A_PARK_BRAKE', lval:1 },
+        { id:'apu-bleed2',action:'APU Bleed',               value:'VERIFY ON',       lvar:'S_OH_PNEUMATIC_APU_BLEED', lval:1 },
+        { id:'eng-mode',  action:'ENG Mode Selector',       value:'IGN/START',       lvar:'S_ENG_MODE', lval:2 },
+		    //My old: { id:'eng2-mst',  action:'ENG 2 Master Switch',     value:'ON'     lvar:null },
+        //{ id:'eng2-mst',  action:'ENG 2 Master Switch',     value:'ON',              lvar:'S_ENG_MASTER_2', lval:1 },
+        { id:'eng2-mst', action:'ENG 2 Master Switch',      value:'ON', lvar:'S_ENG_MASTER_2', lval:0, noAutoOnStart: true },
+        { id:'eng2-mon',  action:'ENG 2 Parameters',        value:'MONITOR',         lvar:null },
+        { id:'eng2-alv',  action:'ENG 2',                   value:'ALIVE / RUNNING', lvar:null },
+		    //My old: { id:'eng2-mst',  action:'ENG 2 Master Switch',     value:'ON'     lvar:null },
+        //{ id:'eng1-mst',  action:'ENG 1 Master Switch',     value:'ON',              lvar:'S_ENG_MASTER_1', lval:1 },
+        { id:'eng1-mst', action:'ENG 1 Master Switch',      value:'ON', lvar:'S_ENG_MASTER_1', lval:0, noAutoOnStart: true },
+        { id:'eng1-mon',  action:'ENG 1 Parameters',        value:'MONITOR',         lvar:null },
+        { id:'eng1-alv',  action:'ENG 1',                   value:'ALIVE / RUNNING', lvar:null },
+      ]
+    }]
+  },
+  {
+    id: 'after-start', label: 'AFTER\nSTART', name: 'AFTER START & BEFORE TAXI',
+    sections: [{
+      title: 'SYSTEMS & CONTROLS',
+      items: [
+        { id:'eng-norm',  action:'ENG Mode Selector',       value:'NORM',            lvar:'S_ENG_MODE', lval:1 },
+        { id:'apu-bl-off',action:'APU Bleed',               value:'OFF',             lvar:'S_OH_PNEUMATIC_APU_BLEED', lval:0 },
+        { id:'apu-off',   action:'APU Master',              value:'OFF',             lvar:'I_OH_ELEC_APU_MASTER_L', lval:0 },
+        { id:'anti-ice',  action:'Engine & Wing Anti-Ice',  value:'AS REQ',          lvar:null },
+        { id:'autobrk',   action:'Auto Brake',              value:'MAX',             lvar:'I_MIP_AUTOBRAKE_MAX_L', lval:1 },
+        { id:'pws',       action:'Pred. Windshear PWS',     value:'ON',              lvar:'S_WR_PRED_WS', lval:0, noAutoOnStart: true },
+        { id:'wx-on',     action:'Weather Radar',           value:'ON',              lvar:'S_WR_SYS', lval:1, noAutoOnStart: true },
+        // { id:'flaps-to', action:'Flaps SET FOR T.O.',    value:'AS CALCULATED',   lvar:'S_FC_FLAPS', lval:null },
+		    { id:'flaps-to',  action:'Flaps SET FOR T.O.',       value:'AS CALCULATED',  lvar:'S_FC_FLAPS', lgt:0 },
+        { id:'spoilers',  action:'Ground Spoilers',         value:'ARM',             lvar:'A_FC_SPEEDBRAKE', lval:0, noAutoOnStart: true },
+        { id:'rud-trim',  action:'Rudder & Aileron Trim',   value:'ZERO',            lvar:'S_FC_RUDDER_TRIM_RESET', lgt:0 },
+        //{ id:'rud-trim',  action:'Rudder & Aileron Trim',    value:'ZERO',           lvar:'A_FC_RUDDER_TRIM', lval:1 },
+        // { id:'pit-trim',  action:'Pitch Trim',              value:'AS CALCULATED',   lvar:null },
+		    { id:'trim-set',  action:'Elevator Trim',            value:'SET',            lvar:'A_FC_ELEVATOR_TRIM', lval:'A_FC_ELEVATOR_TRIM' },
+        { id:'flt-ctrl',  action:'Flight Controls',         value:'FREE MOVEMENT',   lvar:null },
+        { id:'anti-ice2', action:'ANTI ICE',                value:'AS REQ 10°C',     lvar:null },
+        { id:'ecam-stat', action:'ECAM STATUS',             value:'CHECKED',         lvar:null },
+        { id:'to-config', action:'TO Config Test',          value:'PUSH',            lvar:'I_ECAM_TO', lval:1 },
+      ]
+    }]
+  },
+  {
+    id: 'taxi', label: 'TAXI', name: 'TAXI',
+    sections: [{
+      title: 'TAXI CHECKS',
+      items: [
+        { id:'atc-taxi2', action:'ATC TAXI Clearance',      value:'ByondATC',        lvar:null },
+        { id:'taxi-lt',   action:'TAXI Lights',             value:'ON / SET',        lvar:'S_OH_EXT_LT_NOSE', lval:1 },
+        { id:'rwy-to-lt', action:'RWY Turn Off Lights',     value:'AS REQ (nachts)', lvar:'S_OH_EXT_LT_RWY_TURNOFF', lval:1 },
+        { id:'pk-rel',    action:'PARKING BRAKE',           value:'RELEASE',         lvar:'A_PARK_BRAKE', lval:0 },
+        { id:'taxi-hold', action:'TAXI to Holdingline',     value:'WARTEN',          lvar:null },
+      ]
+    }]
+  },
+  {
+    id: 'lineup', label: 'LINE-UP', name: 'LINEUP',
+    sections: [{
+      title: 'LINEUP CHECKS',
+      items: [
+        { id:'atc-to',    action:'ATC Clearance Takeoff',   value:'ByondATC',        lvar:null },
+        { id:'strobe',    action:'Strobe Lights',           value:'ON',              lvar:'A_LT_STROBE', lval:1 },
+        { id:'tcas-on',   action:'TCAS',                    value:'TA/RA',           lvar:'S_XPDR_MODE', lval:2 },
+        { id:'packs-req', action:'Pack 1 & 2',              value:'AS REQ',          lvar:null },
+        { id:'anti-ice3', action:'ENG & Wing Anti-Ice',     value:'AS REQ',          lvar:null },
+      ]
+    }]
+  },
+  {
+    id: 'takeoff', label: 'TAKE-\nOFF', name: 'TAKEOFF',
+    sections: [{
+      title: 'TAKEOFF',
+      items: [
+        { id:'nose-to',   action:'Nose Light',              value:'ON / T.O.',       lvar:'S_OH_EXT_LT_NOSE', lval:2 },
+        { id:'ldg-lt-on', action:'Landing Lights',          value:'ON',              lvar:'A_LT_LANDING', lval:1 },
+      ]
+    }]
+  },
+  {
+    id: 'climb', label: 'CLIMB', name: 'AFTER TAKEOFF & CLIMB',
+    sections: [{
+      title: 'AFTER TAKEOFF',
+      items: [
+        { id:'gear-up',   action:'Landing Gear',            value:'VERIFY UP',       lvar:'S_MIP_GEAR', lval:0 },
+        { id:'flap-ret',  action:'Flaps',                   value:'VERIFY RETRACTED',lvar:'S_FC_FLAPS', lval:0 },
+        //{ id:'spd-disarm',action:'Ground Spoilers',         value:'DISARM',          lvar:'A_FC_SPEEDBRAKE', lval:0 },
+        { id:'spoilers',  action:'Ground Spoilers',         value:'ARM',             lvar:'A_FC_SPEEDBRAKE', lval:1 },
+        { id:'packs-on',  action:'PACK 1 & 2',              value:'ON',              lvar:'S_OH_PNEUMATIC_PACK_1', lval:1 },
+      ]
+    }, {
+      title: 'ABOVE FL100',
+      items: [
+        { id:'ldg-off',   action:'Landing Lights',          value:'OFF',             lvar:'A_LT_LANDING', lval:0 },
+        { id:'nose-off',  action:'Nose Light',              value:'OFF',             lvar:'S_OH_EXT_LT_NOSE', lval:0 },
+        { id:'terr-off',  action:'Terrain On ND',           value:'OFF',             lvar:null },
+        { id:'pax-signs', action:'Passenger Signs',         value:'AS REQ',          lvar:null },
+      ]
+    }]
+  },
+  {
+    id: 'descent', label: 'DESCENT', name: 'DESCENT & APPROACH',
+    sections: [{
+      title: 'ABOVE FL100',
+      items: [
+        { id:'ldg-on2',   action:'Landing Lights',          value:'ON',              lvar:'A_LT_LANDING', lval:1 },
+        { id:'nose-on2',  action:'Nose Light',              value:'ON',              lvar:'S_OH_EXT_LT_NOSE', lval:2 },
+        { id:'pax-signs2',action:'Passenger Signs',         value:'AS REQ',          lvar:'A_SEATBELTS', lval:1 },
+        //{ id:'spd-arm2',  action:'Ground Spoilers',         value:'ARM',             lvar:'A_SPOILERS_ARM', lval:1 },
+        { id:'spoilers',  action:'Ground Spoilers',         value:'ARM',             lvar:'A_FC_SPEEDBRAKE', lval:0, noAutoOnStart: true },
+        { id:'autobrk2',  action:'AUTO BRK',                value:'SET MED',         lvar:'I_MIP_AUTOBRAKE_MED_L', lval:1 },
+        { id:'ecam-ldg',  action:'ECAM MEMO',               value:'LDG NO BLUE',     lvar:null },
+      ]
+    }]
+  },
+  {
+    id: 'landing', label: 'LANDING', name: 'LANDING',
+    sections: [{
+      title: 'LANDING CHECKS',
+      vrefCalculator: true,
+      items: [
+        { id:'gear-dn',   action:'Landing Gear',            value:'VERIFY DOWN',     lvar:'S_MIP_GEAR', lval:1 },
+        { id:'flap-full', action:'Flaps',                   value:'VERIFY FULL',     lvar:'S_FC_FLAPS', lval:4 },
+        { id:'ldg-lt2',   action:'Landing Lights',          value:'ON',              lvar:'A_LT_LANDING', lval:1 },
+      ]
+    }]
+  },
+  {
+    id: 'after-ldg', label: 'AFTER\nLDG', name: 'AFTER LANDING',
+    sections: [{
+      title: 'AFTER LANDING',
+      items: [
+        { id:'spd-dis2',  action:'Ground Spoilers',         value:'DISARM',          lvar:'A_SPOILERS_ARM', lval:1, noAutoOnStart: true },
+        { id:'flap-ret2', action:'Flaps',                   value:'RETRACT',         lvar:'S_FC_FLAPS', lval:0 },
+        { id:'nose-off2', action:'Nose Light',              value:'OFF',             lvar:'S_OH_EXT_LT_NOSE', lval:0 },
+        { id:'ldg-off2',  action:'Landing Lights',          value:'OFF',             lvar:'A_LT_LANDING', lval:0 },
+        { id:'strb-off',  action:'Strobes',                 value:'OFF',             lvar:'A_LT_STROBE', lval:0 },
+        { id:'taxi-on2',  action:'TAXI Lights',             value:'ON',              lvar:'S_OH_EXT_LT_NOSE', lval:1 },
+        { id:'apu-on2',   action:'APU Master',              value:'ON',              lvar:'I_OH_ELEC_APU_MASTER_L', lval:1 },
+        //{ id:'ldg-off',   action:'Landing Lights',          value:'OFF',             lvar:'A_LT_LANDING', lval:0 },
+        //{ id:'nose-off',  action:'Nose Light',              value:'OFF',             lvar:'S_OH_EXT_LT_NOSE', lval:0 }
+        { id:'ldg-off_',  action:'Landing Lights',          value:'OFF',             lvar:'A_LT_LANDING', lval:0 },
+        { id:'nose-off_', action:'Nose Light',              value:'OFF',             lvar:'S_OH_EXT_LT_NOSE', lval:0 },
+        { id:'apu-bl2',   action:'APU Bleed (nach AVAIL)',  value:'ON',              lvar:'S_OH_PNEUMATIC_APU_BLEED', lval:1 },
+      ]
+    }]
+  },
+  {
+    id: 'parking', label: 'PARKING', name: 'PARKING',
+    sections: [{
+      title: 'PARKING',
+      items: [
+        { id:'pk-brk2',   action:'PARK BRK / CHOCKS',       value:'SET',             lvar:'A_PARK_BRAKE', lval:1 },
+        //{ id:'eng-off',   action:'ENGINES',                  value:'OFF',             lvar:'A_ENG1_MASTER', lval:0 },
+        { id:'eng1-mst',  action:'ENG 1 Master Switch',     value:'OFF',              lvar:'S_ENG_MASTER_1', lval:1, noAutoOnStart: true },
+        { id:'eng2-mst',  action:'ENG 2 Master Switch',     value:'OFF',              lvar:'S_ENG_MASTER_2', lval:1, noAutoOnStart: true },
+        { id:'wing-off',  action:'WING LIGHTS',              value:'OFF',             lvar:'S_OH_EXT_LT_WING', lval:0 },
+        { id:'fuel-off',  action:'FUEL PUMPS',               value:'OFF',             lvar:'S_OH_FUEL_RIGHT_2', lval:0 },
+      ]
+    }]
+  },
+  {
+    id: 'securing', label: 'SECURE', name: 'SECURING THE AIRCRAFT',
+    sections: [{
+      title: 'SECURING',
+      items: [
+        { id:'oxy-off',   action:'OXYGEN',                   value:'OFF',             lvar:'S_OH_OXYGEN_CREW_OXYGEN', lval:0 },
+        { id:'emer-off',  action:'EMER EXIT LT',             value:'OFF',             lvar:'S_OH_INT_LT_EMER', lval:0 },
+        { id:'efb-off',   action:'EFBs',                     value:'OFF',             lvar:null },
+        //{ id:'bat-off',   action:'BATTERIES',                value:'OFF',             lvar:null },
+        { id:'bat12_',     action:'Battery 1 & 2',            value:'ON',             lvar:'S_OH_ELEC_BAT1', lval:0 },
+      ]
+    }]
+  },
+];
+
+// ─── L-VAR Bridge (WebSocket zu Node.js) ───
+let ws = null;
+let lvarValues = {};
+let wsConnected = false;
+
+function connectLVars() {
+  if (ws && ws.readyState === WebSocket.OPEN) return;
+  updateLVarStatus('connecting');
+  try {
+    ws = new WebSocket('ws://localhost:8765');
+    ws.onopen = () => {
+      wsConnected = true;
+      updateLVarStatus('connected');
+      const needed = getAllLVars();
+      ws.send(JSON.stringify({ type:'subscribe', lvars: needed }));
+      // Snapshot nach kurzer Verzögerung nehmen (warten bis erste Werte ankommen)
+      setTimeout(() => {
+        takeSnapshot();
+        updateLVarStatus('connected');
+      }, 1500);
+    };
+    ws.onmessage = (evt) => {
+      try {
+        const data = JSON.parse(evt.data);
+        if (data.type === 'server_info') {
+            const url = `http://${data.ip}:${data.port}`;
+            const el = document.getElementById('tablet-url');
+            if (el) el.textContent = url;
+            return;
+          }
+          if (data.type === 'chr_event') {
+            showChrBanner(data.event); // 'start' oder 'stop'
+            return;
+          }
+          if (data.type === 'state_sync') {
+            // State von anderem Client empfangen
+            if (data.state) {
+              state = { ...state, ...data.state };
+              localStorage.setItem('fenix-cl-v2', JSON.stringify(state));
+            }
+            if (typeof data.phaseIdx === 'number' && data.phaseIdx !== currentPhaseIdx) {
+              currentPhaseIdx = data.phaseIdx;
+            }
+            render();
+            return;
+          }
+          if (data.type === 'lvar_update') {
+          lvarValues = { ...lvarValues, ...data.values };
+          checkAutoItems(); // render() nur wenn sich wirklich was ändert
+          checkAltitudeWarning();
+          checkCallouts();
+        }
+      } catch(e) { console.error(e); }
+    };
+    ws.onclose = () => {
+      wsConnected = false;
+      updateLVarStatus('disconnected');
+      setTimeout(connectLVars, 5000);
+    };
+    ws.onerror = () => {
+      wsConnected = false;
+      updateLVarStatus('error');
+    };
+  } catch(e) {
+    updateLVarStatus('error');
+  }
+}
+
+function updateLVarStatus(status) {
+  const dot  = document.getElementById('lvar-dot');
+  const text = document.getElementById('lvar-status-text');
+  const btn  = document.getElementById('lvar-connect-btn');
+  dot.className = '';
+  if (status === 'connected') {
+    dot.classList.add('connected');
+    text.textContent = lvarSnapshot
+      ? 'L-VARs: VERBUNDEN – AUTO-CHECK AKTIV'
+      : 'L-VARs: VERBUNDEN – Snapshot lädt...';
+    btn.textContent = 'TRENNEN';
+    btn.onclick = () => { ws && ws.close(); };
+  } else if (status === 'connecting') {
+    text.textContent = 'L-VARs: VERBINDE...';
+    btn.textContent = 'WARTE...';
+  } else if (status === 'error') {
+    dot.classList.add('error');
+    text.textContent = 'L-VARs: FEHLER – Bridge nicht gestartet?';
+    btn.textContent = 'RETRY';
+    btn.onclick = connectLVars;
+  } else {
+    text.textContent = 'L-VARs: NICHT VERBUNDEN (manuell)';
+    btn.textContent = 'VERBINDEN';
+    btn.onclick = connectLVars;
+  }
+}
+
+function getAllLVars() {
+  const names = new Set();
+  CHECKLISTS.forEach(ph => ph.sections.forEach(s => s.items.forEach(i => {
+    if (i.lvar) names.add(i.lvar);
+  })));
+  return [...names];
+}
+
+// ─── Snapshot System ───
+let lvarSnapshot = null; // Startwerte beim ersten Verbinden
+
+function takeSnapshot() {
+  lvarSnapshot = { ...lvarValues };
+  console.log('[SNAPSHOT] Startwerte gespeichert:', Object.keys(lvarSnapshot).length, 'Variablen');
+}
+
+function checkAutoItems() {
+  if (!lvarSnapshot) return;
+
+  let anyChanged = false;
+  CHECKLISTS.forEach(ph => ph.sections.forEach(s => s.items.forEach(i => {
+    if (!i.lvar || (i.lval === null && i.lgt === undefined)) return;
+    if (!(i.lvar in lvarValues)) return;
+
+    const actual  = Math.round(Number(lvarValues[i.lvar]));
+    const snap    = Math.round(Number(lvarSnapshot[i.lvar] ?? actual));
+    let matches = i.lgt !== undefined ? (actual > i.lgt) : (actual === i.lval);
+    // Doppel-Check: lvar2/lval2
+    if (matches && i.lvar2 && i.lvar2 in lvarValues) {
+      const actual2 = Math.round(Number(lvarValues[i.lvar2]));
+      matches = (actual2 === i.lval2);
+    }
+
+    // Item abhaken wenn Sollwert erreicht
+    const prevState = state[i.id];
+    // noAutoOnStart: nur abhaken wenn Wert sich seit Snapshot geändert hat
+    if (i.noAutoOnStart && actual === snap) return;
+    if (matches && prevState !== 'auto' && prevState !== true) {
+      state[i.id] = 'auto';
+      updateItemDOM(i.id, 'auto', actual);
+      anyChanged = true;
+      // APU Master → 3s Timer für apu-start
+      if (i.id === 'apu-mstr') {
+        setTimeout(() => {
+          if (state['apu-mstr']) {
+            state['apu-start'] = true;
+            saveState();
+            render();
+            setTimeout(() => scrollToNextOpen(), 150);
+          }
+        }, 3000);
+      }
+    } else if (!matches && prevState === 'auto') {
+      // Nur zurücksetzen wenn sich der Wert seit Snapshot geändert hat
+      // (verhindert dass Items die beim Start schon falsch waren zurückgesetzt werden)
+      if (actual !== snap) {
+        state[i.id] = false;
+        updateItemDOM(i.id, false, actual);
+        anyChanged = true;
+      }
+    } else {
+      updateItemValue(i.id, actual);
+    }
+  })));
+  if (anyChanged) {
+    saveState();
+    renderTabs();
+    renderProgress();
+  }
+}
+
+// Einzelnes Item im DOM updaten ohne alles neu zu rendern
+function updateItemDOM(id, newState, actualVal) {
+  const el = document.getElementById('item-' + id);
+  if (!el) return;
+  el.className = 'checklist-item' + (newState === 'auto' ? ' auto-done' : newState ? ' done' : '');
+  const badge = el.querySelector('.lvar-badge');
+  if (badge) badge.textContent = newState === 'auto' ? 'AUTO ✓' : 'L-VAR';
+  updateItemValue(id, actualVal);
+  // Nach Auto-Abhaken zum nächsten offenen Item scrollen
+  if (newState === 'auto') setTimeout(() => scrollToNextOpen(), 200);
+}
+
+function updateItemValue(id, actualVal) {
+  const el = document.getElementById('item-' + id);
+  if (!el) return;
+  const valEl = el.querySelector('.item-value');
+  if (!valEl) return;
+  const item = findItem(id);
+  if (!item) return;
+  const dispActual = (item.id === 'trim-set' && actualVal !== undefined)
+    ? (Math.round(Number(actualVal) / 100) / 10).toFixed(1)
+    : actualVal;
+  valEl.textContent = wsConnected && actualVal !== undefined
+    ? `${item.value}  ·  IST: ${dispActual}`
+    : item.value;
+}
+
+// ─── Vref Rechner ───
+// A320 Vref Tabelle (vereinfacht, Conf FULL)
+// Quelle: Airbus FCOM / typische Referenzwerte
+function calcVref(weightT) {
+  // Vref FULL (Conf FULL) - typische A320 Werte
+  // Linear interpoliert zwischen Stützpunkten
+  const table = [
+    { w: 40, vref: 112 },
+    { w: 45, vref: 118 },
+    { w: 50, vref: 124 },
+    { w: 55, vref: 130 },
+    { w: 60, vref: 136 },
+    { w: 65, vref: 141 },
+    { w: 70, vref: 146 },
+    { w: 75, vref: 151 },
+    { w: 77, vref: 153 },
+  ];
+
+  const w = Math.max(40, Math.min(77, weightT));
+  for (let i = 0; i < table.length - 1; i++) {
+    if (w >= table[i].w && w <= table[i+1].w) {
+      const t = (w - table[i].w) / (table[i+1].w - table[i].w);
+      return Math.round(table[i].vref + t * (table[i+1].vref - table[i].vref));
+    }
+  }
+  return table[table.length-1].vref;
+}
+
+function calcSpeeds(weightT) {
+  const vref = calcVref(weightT);
+  return {
+    vref:  vref,
+    vapp:  vref + 5,          // Vapp = Vref + 5 (standard, ohne Wind-Additive)
+    f3:    vref + 10,          // Conf 3 ca. Vref + 10
+    f2:    vref + 20,          // Conf 2 ca. Vref + 20
+    f1:    vref + 35,          // Conf 1 ca. Vref + 35
+    s:     vref + 50,          // S-Speed (Slats only)
+  };
+}
+
+function buildVrefCalculator() {
+  const saved = parseFloat(localStorage.getItem('vref-weight') || '65');
+  const speeds = calcSpeeds(saved);
+
+  const box = document.createElement('div');
+  box.className = 'vref-box';
+  box.innerHTML = `
+    <div class="vref-title">VREF / VFE RECHNER</div>
+    <div class="vref-weight-row">
+      <span class="vref-weight-label">Landegewicht</span>
+      <input class="vref-weight-input" id="vref-weight-input" type="number"
+             min="40" max="77" step="0.5" value="${saved}">
+      <span class="vref-weight-unit">t</span>
+    </div>
+    <div id="vref-speeds">
+      ${renderVrefSpeeds(speeds)}
+    </div>
+  `;
+
+  // Live Update bei Eingabe
+  setTimeout(() => {
+    const inp = document.getElementById('vref-weight-input');
+    if (inp) {
+      inp.addEventListener('input', () => {
+        const w = parseFloat(inp.value) || 65;
+        localStorage.setItem('vref-weight', w);
+        const sp = calcSpeeds(w);
+        const grid = document.getElementById('vref-speeds');
+        if (grid) grid.innerHTML = renderVrefSpeeds(sp);
+      });
+    }
+  }, 0);
+
+  return box;
+}
+
+function renderVrefSpeeds(sp) {
+  // VFE = Max Speed für jeweilige Klappenstellung (A320 Standard, fix)
+  const vfe = { f1: 230, f1f: 215, f2: 200, f3: 185, full: 177 };
+  return `
+    <div style="font-family:var(--mono);font-size:8px;color:var(--text-dim);
+                display:grid;grid-template-columns:1fr 1fr 1fr;
+                gap:2px;padding:2px 0 6px;letter-spacing:1px;">
+      <span></span><span style="color:var(--accent)">VREF/VAPP</span><span style="color:#f59e0b">VFE MAX</span>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;">
+      <div class="vref-speed-row" style="grid-column:1;flex-direction:column;align-items:flex-start;gap:1px">
+        <span class="vref-speed-label">CONF 1</span>
+        <span style="font-family:var(--mono);font-size:8px;color:#5a6a7e">S-Speed</span>
+      </div>
+      <div class="vref-speed-row"><span class="vref-speed-val" style="font-size:12px">${sp.f1}</span></div>
+      <div class="vref-speed-row"><span class="vref-speed-val" style="font-size:12px;color:#f59e0b">${vfe.f1}</span></div>
+
+      <div class="vref-speed-row" style="flex-direction:column;align-items:flex-start;gap:1px">
+        <span class="vref-speed-label">CONF 2</span>
+        <span style="font-family:var(--mono);font-size:8px;color:#5a6a7e">F-Speed</span>
+      </div>
+      <div class="vref-speed-row"><span class="vref-speed-val" style="font-size:12px">${sp.f2}</span></div>
+      <div class="vref-speed-row"><span class="vref-speed-val" style="font-size:12px;color:#f59e0b">${vfe.f2}</span></div>
+
+      <div class="vref-speed-row" style="flex-direction:column;align-items:flex-start;gap:1px">
+        <span class="vref-speed-label">CONF 3</span>
+        <span style="font-family:var(--mono);font-size:8px;color:#5a6a7e"></span>
+      </div>
+      <div class="vref-speed-row"><span class="vref-speed-val" style="font-size:12px">${sp.f3}</span></div>
+      <div class="vref-speed-row"><span class="vref-speed-val" style="font-size:12px;color:#f59e0b">${vfe.f3}</span></div>
+
+      <div class="vref-speed-row" style="flex-direction:column;align-items:flex-start;gap:1px">
+        <span class="vref-speed-label">FULL</span>
+        <span style="font-family:var(--mono);font-size:8px;color:#5a6a7e">Vref</span>
+      </div>
+      <div class="vref-speed-row"><span class="vref-speed-val" style="font-size:12px">${sp.vref}</span></div>
+      <div class="vref-speed-row"><span class="vref-speed-val" style="font-size:12px;color:#f59e0b">${vfe.full}</span></div>
+
+      <div class="vref-speed-row vapp" style="grid-column:1/-1;justify-content:space-between">
+        <span class="vref-speed-label" style="font-size:11px">VAPP &nbsp;<span style="color:#5a6a7e;font-size:9px">(Vref +5, ohne Wind)</span></span>
+        <span class="vref-speed-val" style="font-size:15px">${sp.vapp} kt</span>
+      </div>
+    </div>
+  `;
+}
+
+function scrollToNextOpen() {
+  const phase = CHECKLISTS[currentPhaseIdx];
+  // Erstes Item finden das noch nicht erledigt ist
+  for (const sec of phase.sections) {
+    for (const item of sec.items) {
+      if (!state[item.id]) {
+        const el = document.getElementById('item-' + item.id);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          // Kurz highlighten damit man sieht wo man ist
+          el.style.background = 'rgba(0,180,216,0.08)';
+          setTimeout(() => { el.style.background = ''; }, 800);
+        }
+        return;
+      }
+    }
+  }
+}
+
+function findItem(id) {
+  for (const ph of CHECKLISTS) {
+    for (const s of ph.sections) {
+      for (const i of s.items) {
+        if (i.id === id) return i;
+      }
+    }
+  }
+  return null;
+}
+
+// ─── State ───
+let state = {};
+let currentPhaseIdx = 0;
+
+function initState() {
+  try {
+    const saved = localStorage.getItem('fenix-cl-v2');
+    if (saved) state = JSON.parse(saved);
+  } catch(e) { state = {}; }
+  CHECKLISTS.forEach(ph => ph.sections.forEach(s => s.items.forEach(i => {
+    if (!(i.id in state)) state[i.id] = false;
+  })));
+}
+
+function saveState() {
+  localStorage.setItem('fenix-cl-v2', JSON.stringify(state));
+  broadcastState();
+}
+
+function broadcastState() {
+  if (ws && ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify({
+      type: 'state_update',
+      state: state,
+      phaseIdx: currentPhaseIdx
+    }));
+  }
+}
+
+function getPhaseProgress(phase) {
+  let done = 0, total = 0;
+  phase.sections.forEach(s => s.items.forEach(i => {
+    total++;
+    if (state[i.id]) done++;
+  }));
+  return { done, total };
+}
+
+// ─── Render ───
+function renderTabs() {
+  const wrap = document.getElementById('phase-tabs');
+  wrap.innerHTML = '';
+  CHECKLISTS.forEach((ph, idx) => {
+    const { done, total } = getPhaseProgress(ph);
+    const tab = document.createElement('button');
+    tab.className = 'phase-tab' + (idx === currentPhaseIdx ? ' active':'') + (done===total?' complete':'');
+    const lines = ph.label.split('\n');
+    tab.innerHTML = lines.join('<br>') + `<span class="tab-prog">${done}/${total}</span>`;
+    tab.onclick = () => { currentPhaseIdx = idx; render(); broadcastState(); };
+    wrap.appendChild(tab);
+  });
+}
+
+function renderProgress() {
+  const { done, total } = getPhaseProgress(CHECKLISTS[currentPhaseIdx]);
+  document.getElementById('progress-count').textContent = `${done} / ${total}`;
+  document.getElementById('progress-fill').style.width = total ? `${(done/total)*100}%` : '0%';
+  const complete = done === total && total > 0;
+  document.getElementById('complete-banner').style.display = complete ? 'block' : 'none';
+
+  // Auto-Weiterschalten zur nächsten Phase
+  if (complete && settings.autoNext) {
+    const nextIdx = currentPhaseIdx + 1;
+    if (nextIdx < CHECKLISTS.length && !window._autoNextPending) {
+      window._autoNextPending = true;
+      clearTimeout(window._autoNextTimer);
+      window._autoNextTimer = setTimeout(() => {
+        window._autoNextPending = false;
+        // Nochmal prüfen ob Phase immer noch complete (könnte resettet worden sein)
+        const { done: d2, total: t2 } = getPhaseProgress(CHECKLISTS[currentPhaseIdx]);
+        if (d2 === t2 && t2 > 0 && currentPhaseIdx === nextIdx - 1) {
+          currentPhaseIdx = nextIdx;
+          render();
+          const tabs = document.getElementById('phase-tabs');
+          const activeTab = tabs.children[nextIdx];
+          if (activeTab) activeTab.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        }
+      }, 1500);
+    }
+  } else if (!complete) {
+    // Phase nicht mehr complete – Timer abbrechen
+    clearTimeout(window._autoNextTimer);
+    window._autoNextPending = false;
+  }
+}
+
+function renderChecklist() {
+  const wrap = document.getElementById('checklist-wrap');
+  wrap.innerHTML = '';
+  const phase = CHECKLISTS[currentPhaseIdx];
+
+  phase.sections.forEach(sec => {
+    const hdr = document.createElement('div');
+    hdr.className = 'section-header';
+    hdr.textContent = sec.title;
+    wrap.appendChild(hdr);
+
+    // Vref Rechner vor den Items einfügen
+    if (sec.vrefCalculator) {
+      wrap.appendChild(buildVrefCalculator());
+    }
+
+    sec.items.forEach(item => {
+      const isAuto = state[item.id] === 'auto';
+      const isDone = !!state[item.id];
+
+      const div = document.createElement('div');
+      div.id = 'item-' + item.id;
+      div.className = 'checklist-item' + (isAuto ? ' auto-done' : isDone ? ' done' : '');
+      div.onclick = () => {
+        const newVal = state[item.id] ? false : true;
+        state[item.id] = newVal;
+
+        // APU Master → 3s Timer für apu-start
+        if (item.id === 'apu-mstr' && newVal === true) {
+          setTimeout(() => {
+            if (state['apu-mstr']) {
+              state['apu-start'] = true;
+              saveState();
+              render();
+              setTimeout(() => scrollToNextOpen(), 150);
+            }
+          }, 3000);
+        }
+
+        saveState();
+        render();
+        setTimeout(() => scrollToNextOpen(), 150);
+      };
+
+      const cb = document.createElement('div');
+      cb.className = 'item-checkbox';
+
+      const content = document.createElement('div');
+      content.className = 'item-content';
+
+      const action = document.createElement('div');
+      action.className = 'item-action';
+      action.textContent = item.action;
+
+      const val = document.createElement('div');
+      val.className = 'item-value';
+      // Echten L-VAR Wert anzeigen wenn verbunden
+      if (item.lvar && wsConnected && item.lvar in lvarValues) {
+        const rawVal = lvarValues[item.lvar];
+        const dispVal = item.id === 'trim-set'
+          ? (Math.round(Number(rawVal) / 100) / 10).toFixed(1)
+          : rawVal;
+        val.textContent = `${item.value}  ·  IST: ${dispVal}`;
+      } else {
+        val.textContent = item.value;
+      }
+
+      content.appendChild(action);
+      content.appendChild(val);
+      div.appendChild(cb);
+      div.appendChild(content);
+
+      if (item.lvar) {
+        const badge = document.createElement('span');
+        badge.className = 'lvar-badge';
+        badge.textContent = isAuto ? 'AUTO ✓' : 'L-VAR';
+        badge.title = `${item.lvar} = ${item.lval}`;
+        div.appendChild(badge);
+      }
+
+      wrap.appendChild(div);
+    });
+  });
+}
+
+function render() {
+  renderTabs();
+  renderProgress();
+  renderChecklist();
+}
+
+document.getElementById('btn-reset').onclick = () => {
+  const phase = CHECKLISTS[currentPhaseIdx];
+  phase.sections.forEach(s => s.items.forEach(i => { state[i.id] = false; }));
+  // Neuen Snapshot machen – ab jetzt werden Änderungen ab diesem Moment getrackt
+  takeSnapshot();
+  saveState();
+  render();
+};
+
+function scrollTabs(dir) {
+  const tabs = document.getElementById('phase-tabs');
+  tabs.scrollBy({ left: dir * 120, behavior: 'smooth' });
+}
+
+// ─── Settings ───
+let settings = {
+  climbWarn: false,
+  descentWarn: false,
+  autoClose: false,
+  autoConnect: true,
+  sound: false,
+  autoNext: false,
+  chrAuto: false,
+  callouts: false,
+  v1: 145,
+  vr: 150,
+  calloutLang: 'en-US',
+};
+
+function resetAllChecklists() {
+  if (!confirm('Alle Phasen zurücksetzen?')) return;
+  CHECKLISTS.forEach(ph => ph.sections.forEach(s => s.items.forEach(i => {
+    state[i.id] = false;
+  })));
+  currentPhaseIdx = 0;
+  takeSnapshot();
+  saveState();
+  render();
+  // Tabs zum Anfang scrollen
+  const tabs = document.getElementById('phase-tabs');
+  if (tabs) tabs.scrollLeft = 0;
+  closeSettings();
+}
+
+function openSettings() {
+  document.getElementById('settings-overlay').classList.add('open');
+}
+function closeSettings() {
+  document.getElementById('settings-overlay').classList.remove('open');
+}
+function saveSettings() {
+  settings.climbWarn   = document.getElementById('tog-climb').checked;
+  settings.descentWarn = document.getElementById('tog-descent').checked;
+  settings.autoClose   = document.getElementById('tog-autoclose').checked;
+  settings.autoConnect = document.getElementById('tog-autoconnect').checked;
+  settings.sound       = document.getElementById('tog-sound').checked;
+  settings.autoNext    = document.getElementById('tog-autonext').checked;
+  settings.chrAuto      = document.getElementById('tog-chr').checked;
+  settings.callouts     = document.getElementById('tog-callouts').checked;
+  settings.v1           = parseInt(document.getElementById('inp-v1').value) || 145;
+  settings.vr           = parseInt(document.getElementById('inp-vr').value) || 150;
+  settings.calloutLang  = document.getElementById('sel-voice').value;
+  localStorage.setItem('fenix-settings', JSON.stringify(settings));
+  // Bridge sofort informieren
+  if (ws && ws.readyState === WebSocket.OPEN) {
+    ws.send(JSON.stringify({ type: 'set_chr', enabled: settings.chrAuto }));
+  }
+}
+function loadSettings() {
+  try {
+    const s = JSON.parse(localStorage.getItem('fenix-settings') || '{}');
+    settings = { ...settings, ...s };
+  } catch(e) {}
+  document.getElementById('tog-climb').checked      = settings.climbWarn;
+  document.getElementById('tog-descent').checked    = settings.descentWarn;
+  document.getElementById('tog-autoclose').checked  = settings.autoClose;
+  document.getElementById('tog-autoconnect').checked= settings.autoConnect;
+  document.getElementById('tog-sound').checked      = settings.sound;
+  document.getElementById('tog-autonext').checked   = settings.autoNext;
+  document.getElementById('tog-chr').checked        = settings.chrAuto ?? false;
+  document.getElementById('tog-callouts').checked   = settings.callouts ?? false;
+  document.getElementById('inp-v1').value           = settings.v1 ?? 145;
+  document.getElementById('inp-vr').value           = settings.vr ?? 150;
+  document.getElementById('sel-voice').value        = settings.calloutLang ?? 'en-US';
+}
+
+// ─── Audio Engine ───
+let audioCtx = null;
+
+function getAudioCtx() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return audioCtx;
+}
+
+function playChime(type) {
+  if (!settings.sound) return;
+  const ctx = getAudioCtx();
+
+  // Airbus-Style Chime: zwei Töne kurz hintereinander
+  const notes = type === 'climb'
+    ? [880, 660]   // hoch → tief (Lights OFF reminder)
+    : [660, 880];  // tief → hoch (Lights ON reminder)
+
+  notes.forEach((freq, i) => {
+    const osc  = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(freq, ctx.currentTime + i * 0.25);
+
+    gain.gain.setValueAtTime(0, ctx.currentTime + i * 0.25);
+    gain.gain.linearRampToValueAtTime(0.4, ctx.currentTime + i * 0.25 + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.25 + 0.4);
+
+    osc.start(ctx.currentTime + i * 0.25);
+    osc.stop(ctx.currentTime + i * 0.25 + 0.5);
+  });
+}
+
+
+// ─── CALLOUT ENGINE ───
+const CALLOUT_FLAP_NAMES = ['Flaps Up', 'Flaps 1', 'Flaps 2', 'Flaps 3', 'Flaps Full'];
+
+let calloutState = {
+  lastFlap:       -1,   // letzte bekannte Klappenstellung
+  said100kt:      false,
+  saidV1:         false,
+  saidRotate:     false,
+  saidPositive:   false,
+  saidGearUp:     false,
+  // Approach callouts – letzte angesagte Höhe
+  lastRadioCallout: 9999,
+};
+
+let _calloutSpeaking = false;
+const _calloutQueue   = [];
+
+function calloutSpeak(text) {
+  if (!settings.callouts) return;
+  _calloutQueue.push(text);
+  if (!_calloutSpeaking) processCalloutQueue();
+}
+
+function processCalloutQueue() {
+  if (_calloutQueue.length === 0) { _calloutSpeaking = false; return; }
+  _calloutSpeaking = true;
+  const text = _calloutQueue.shift();
+  showCalloutBanner(text);
+  const utt = new SpeechSynthesisUtterance(text);
+  utt.lang  = settings.calloutLang ?? 'en-US';
+  utt.rate  = 1.1;
+  utt.pitch = 0.9;
+  utt.volume = 1.0;
+  utt.onend = () => setTimeout(processCalloutQueue, 200);
+  utt.onerror = () => setTimeout(processCalloutQueue, 200);
+  speechSynthesis.speak(utt);
+}
+
+function showCalloutBanner(text) {
+  const el = document.getElementById('callout-banner');
+  if (!el) return;
+  el.textContent = text.toUpperCase();
+  el.style.display = 'block';
+  el.style.animation = 'none';
+  void el.offsetWidth; // reflow
+  el.style.animation = 'calloutFade 3s forwards';
+  setTimeout(() => { el.style.display = 'none'; }, 3000);
+}
+
+function resetCalloutState() {
+  calloutState = {
+    lastFlap: -1,
+    said100kt: false,
+    saidV1: false,
+    saidRotate: false,
+    saidPositive: false,
+    saidGearUp: false,
+    lastRadioCallout: 9999,
+  };
+}
+
+function checkCallouts() {
+  if (!settings.callouts || !wsConnected) return;
+
+  const spd      = lvarValues['A_AIRSPEED'] ?? 0;
+  const radioAlt = lvarValues['A_RADIO_ALT'] ?? 9999;
+  const vs       = lvarValues['A_VS']        ?? 0;
+  const gear     = lvarValues['S_MIP_GEAR']  ?? 1;
+  const flap     = lvarValues['S_FC_FLAPS']  ?? 0;
+  const onGround = radioAlt < 10 && Math.abs(vs) < 200;
+
+  // ── Flap Callouts (immer) ──
+  const flapIdx = Math.round(Number(flap));
+  if (calloutState.lastFlap !== -1 && flapIdx !== calloutState.lastFlap) {
+    if (flapIdx >= 0 && flapIdx <= 4) {
+      calloutSpeak(CALLOUT_FLAP_NAMES[flapIdx]);
+    }
+  }
+  calloutState.lastFlap = flapIdx;
+
+  // ── Takeoff Callouts (nur am Boden / kurz nach Abheben) ──
+  if (onGround || radioAlt < 400) {
+    if (!calloutState.said100kt && spd >= 100) {
+      calloutState.said100kt = true;
+      calloutSpeak('One hundred');
+    }
+    if (!calloutState.saidV1 && spd >= (settings.v1 ?? 145)) {
+      calloutState.saidV1 = true;
+      calloutSpeak('V1');
+    }
+    if (!calloutState.saidRotate && spd >= (settings.vr ?? 150)) {
+      calloutState.saidRotate = true;
+      calloutSpeak('Rotate');
+    }
+  }
+
+  // ── Positive Climb / Gear Up (kurz nach Abheben) ──
+  if (!onGround && radioAlt > 10 && radioAlt < 400) {
+    if (!calloutState.saidPositive && vs > 200) {
+      calloutState.saidPositive = true;
+      calloutSpeak('Positive climb');
+    }
+    if (!calloutState.saidGearUp && calloutState.saidPositive && gear === 0) {
+      calloutState.saidGearUp = true;
+      calloutSpeak('Gear up');
+    }
+  }
+
+  // ── Approach Callouts (Radioaltimeter) ──
+  const approachCallouts = [1000, 500, 400, 300, 200, 100, 50, 40, 30, 20, 10];
+  if (!onGround && vs < -100) {
+    for (const alt of approachCallouts) {
+      if (radioAlt <= alt && calloutState.lastRadioCallout > alt) {
+        calloutState.lastRadioCallout = alt;
+        calloutSpeak(String(alt));
+        break;
+      }
+    }
+  }
+
+  // ── Reset nach Landung ──
+  if (onGround && calloutState.saidRotate) {
+    // Kurz nach Touchdown alles zurücksetzen
+    setTimeout(() => resetCalloutState(), 5000);
+  }
+}
+
+// ─── CHR Banner ───
+let _chrBannerTimer = null;
+
+function showChrBanner(type) {
+  const banner = document.getElementById('chr-banner');
+  if (!banner) return;
+  clearTimeout(_chrBannerTimer);
+  if (type === 'start') {
+    banner.className = 'chr-start';
+    banner.textContent = '⏱ CHR GESTARTET – 10ft Radio Alt';
+  } else {
+    banner.className = 'chr-stop';
+    banner.textContent = '⏹ CHR GESTOPPT – TOUCHDOWN';
+  }
+  // Nach 5 Sekunden ausblenden
+  _chrBannerTimer = setTimeout(() => {
+    banner.className = '';
+    banner.textContent = '';
+  }, 5000);
+}
+
+// ─── Altitude Warning ───
+let lastWarnAlt100 = null; // Letzte 100ft Stufe bei der gewarnt wurde
+let altWarnTimer   = null;
+
+function get100ftBucket(alt) {
+  return Math.floor(alt / 100) * 100;
+}
+
+function checkAltitudeWarning() {
+  if (!wsConnected) return;
+  const alt = lvarValues['A_ALT'] ?? 0;
+  const vs  = lvarValues['A_VS']  ?? 0;
+  const warn = document.getElementById('alt-warning');
+
+  const climbing   = vs > 100;
+  const descending = vs < -100;
+  const bucket     = get100ftBucket(alt);
+
+  // Reset wenn weit weg von FL100
+  if (alt > 11000 || alt < 8500) {
+    lastWarnAlt100 = null;
+    hideAltWarn();
+    return;
+  }
+
+  // Steigflug: 9600–10200ft, alle 100ft
+  if (settings.climbWarn && climbing && alt >= 9600 && alt <= 10000) {
+    if (bucket !== lastWarnAlt100) {
+      lastWarnAlt100 = bucket;
+      warn.className = 'climb';
+      warn.innerHTML = `↑ ${bucket.toLocaleString()} ft – LANDING LIGHTS OFF · NOSE OFF`;
+      playChime('climb');
+      startAutoClose();
+    }
+  }
+  // Sinkflug: 10400–9800ft, alle 100ft
+  else if (settings.descentWarn && descending && alt <= 10400 && alt >= 10000) {
+    if (bucket !== lastWarnAlt100) {
+      lastWarnAlt100 = bucket;
+      warn.className = 'descent';
+      warn.innerHTML = `↓ ${bucket.toLocaleString()} ft – LANDING LIGHTS ON · NOSE ON`;
+      playChime('descent');
+      startAutoClose();
+    }
+  }
+}
+
+function startAutoClose() {
+  clearTimeout(altWarnTimer);
+  // Klick auf Banner schließt ihn
+  const warn = document.getElementById('alt-warning');
+  warn.onclick = hideAltWarn;
+  if (settings.autoClose) {
+    altWarnTimer = setTimeout(hideAltWarn, 30000);
+  }
+}
+
+function hideAltWarn() {
+  clearTimeout(altWarnTimer);
+  const warn = document.getElementById('alt-warning');
+  warn.className = '';
+  warn.innerHTML = '';
+}
+
+// Manuelles Fenster-Dragging (da focusable=false kein app-region drag erlaubt)
+function startDrag(e) {
+  if (e.target.closest('#titlebar-btns') || e.target.closest('#btn-settings')) return;
+  window.electronAPI.startDrag(e.screenX, e.screenY);
+}
+
+function toggleCollapse() {
+  const app = document.getElementById('app');
+  const btn = document.getElementById('btn-collapse');
+  const collapsed = app.classList.toggle('collapsed');
+  btn.textContent = collapsed ? '▼' : '▲';
+  btn.title = collapsed ? 'Ausklappen' : 'Einklappen';
+  window.electronAPI.setHeight(collapsed ? 42 : 780);
+}
+
+loadSettings();
+
+// ─── Shortcut Recorder ───────────────────────────────────────────
+let _scRecording = false;
+
+function formatShortcutDisplay(sc) {
+  return sc
+    .replace('CommandOrControl', 'Ctrl')
+    .replace('Control', 'Ctrl');
+}
+
+async function initShortcutDisplay() {
+  if (!window.electronAPI?.getShortcut) return;
+  const sc = await window.electronAPI.getShortcut();
+  const el = document.getElementById('shortcut-display');
+  if (el) el.textContent = formatShortcutDisplay(sc);
+}
+
+function startShortcutRecording() {
+  if (_scRecording) return;
+  _scRecording = true;
+  const box = document.getElementById('shortcut-recorder');
+  const lbl = document.getElementById('shortcut-display');
+  box.classList.add('recording');
+  lbl.textContent = 'Tasten drücken…';
+
+  const handler = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    // Nur Modifier allein ignorieren
+    if (['Control','Shift','Alt','Meta'].includes(e.key)) return;
+
+    const mods = [];
+    if (e.ctrlKey || e.metaKey) mods.push('CommandOrControl');
+    if (e.shiftKey)              mods.push('Shift');
+    if (e.altKey)                mods.push('Alt');
+
+    // Key-Name für Electron
+    let key = e.key;
+    if (key === ' ')       key = 'Space';
+    else if (key.length === 1) key = key.toUpperCase();
+
+    const shortcut = [...mods, key].join('+');
+
+    document.removeEventListener('keydown', handler, true);
+    _scRecording = false;
+    box.classList.remove('recording');
+
+    // An Main-Prozess senden
+    const ok = await window.electronAPI.setShortcut(shortcut);
+    if (ok) {
+      lbl.textContent = formatShortcutDisplay(shortcut);
+    } else {
+      lbl.textContent = '⚠ Bereits belegt';
+      setTimeout(initShortcutDisplay, 2000);
+    }
+  };
+
+  document.addEventListener('keydown', handler, true);
+}
+
+initShortcutDisplay();
+initState();
+render();
+// Automatisch verbinden versuchen beim Start
+if (settings.autoConnect) setTimeout(() => {
+  connectLVars();
+  // CHR Setting nach Verbindungsaufbau senden
+  setTimeout(() => {
+    if (ws && ws.readyState === WebSocket.OPEN && settings.chrAuto) {
+      ws.send(JSON.stringify({ type: 'set_chr', enabled: true }));
+    }
+  }, 2000);
+}, 1000);
+</script>
+</body>
+</html>
