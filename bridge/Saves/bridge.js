@@ -8,11 +8,11 @@ console.log('[BRIDGE] Warte auf MSFS Verbindung...');
 
 // ─── L-VARs via SimConnect ───
 const LVARS = [
-  'S_OH_ELEC_BAT1',
+  //'S_OH_ELEC_BAT1',
   'S_OH_ELEC_BAT2',
   'S_OH_SIGNS_SMOKING',
   'I_OH_ELEC_EXT_PWR_U',
-  'S_OH_ELEC_APU_MASTER',
+  //'S_OH_ELEC_APU_MASTER',
   'I_OH_ELEC_APU_MASTER_L',
   'S_ENG_MODE',
   'S_OH_EXT_LT_BEACON',
@@ -20,34 +20,34 @@ const LVARS = [
   'S_OH_EXT_LT_LANDING_L',
   'S_OH_EXT_LT_LANDING_R',
   'S_OH_EXT_LT_NOSE',
-  'S_OH_EXT_LT_RWY_TURNOFF',
-  'S_OH_EXT_LT_WING',
+  //S_OH_EXT_LT_RWY_TURNOFF',
+  //'S_OH_EXT_LT_WING',
   'S_OH_EXT_LT_NAV_LOGO',
-  'S_OH_FUEL_LEFT_1',
-  'S_OH_FUEL_LEFT_2',
-  'S_OH_FUEL_RIGHT_1',
+  //'S_OH_FUEL_LEFT_1',
+  //'S_OH_FUEL_LEFT_2',
+  //'S_OH_FUEL_RIGHT_1',
   'S_OH_FUEL_RIGHT_2',
-  'S_OH_FUEL_CENTER_1',
-  'S_OH_FUEL_CENTER_2',
-  'S_OH_FUEL_XFEED',
-  'S_OH_FUEL_MODE_SEL',
-  'S_OH_NAV_IR1_MODE',
-  'S_OH_NAV_IR2_MODE',
+  //'S_OH_FUEL_CENTER_1',
+  //'S_OH_FUEL_CENTER_2',
+  //'S_OH_FUEL_XFEED',
+  //'S_OH_FUEL_MODE_SEL',
+  //'S_OH_NAV_IR1_MODE',
+  //'S_OH_NAV_IR2_MODE',
   'S_OH_NAV_IR3_MODE',
-  'S_OH_PNEUMATIC_APU_BLEED',
-  'S_OH_PNEUMATIC_PACK_1',
-  'S_OH_PNEUMATIC_PACK_2',
-  'S_OH_PNEUMATIC_ENG1_ANTI_ICE',
-  'S_OH_PNEUMATIC_ENG2_ANTI_ICE',
-  'S_OH_PNEUMATIC_WING_ANTI_ICE',
-  'S_OH_PROBE_HEAT',
+  //'S_OH_PNEUMATIC_APU_BLEED',
+  //'S_OH_PNEUMATIC_PACK_1',
+  //'S_OH_PNEUMATIC_PACK_2',
+  //'S_OH_PNEUMATIC_ENG1_ANTI_ICE',
+  //'S_OH_PNEUMATIC_ENG2_ANTI_ICE',
+  //'S_OH_PNEUMATIC_WING_ANTI_ICE',
+  //'S_OH_PROBE_HEAT',
   'S_OH_SIGNS',
   'S_OH_INT_LT_EMER',
   'S_OH_OXYGEN_CREW_OXYGEN',
   'S_MIP_PARKING_BRAKE',
   'S_FC_FLAPS',
-  'A_FC_SPEEDBRAKE',
-  'S_FCU_EFIS1_BARO_STD',
+  //'A_FC_SPEEDBRAKE',
+  //'S_FCU_EFIS1_BARO_STD',
   'S_XPDR_OPERATION',
   'S_XPDR_ALTREPORTING',
   'I_FCU_EFIS1_FD',
@@ -69,7 +69,9 @@ const LVARS = [
   'A_FC_ELEVATOR_TRIM',
   'I_ECAM_TO',
   'S_FC_RUDDER_TRIM_RESET',
-  'S_FC_RUDDER_TRIM',
+  //'S_MIP_GPWS_TERRAIN_ON_ND_CAPT',
+  //'I_MIP_GPWS_TERRAIN_ON_ND_CAPT_L',
+  
 ];
 
 const DEF_OFFSET = 100;
@@ -101,7 +103,10 @@ const SIMVARS = [
   { name: 'INDICATED ALTITUDE',           unit: 'feet',    key: 'A_ALT' },
   { name: 'VERTICAL SPEED',               unit: 'ft/min',  key: 'A_VS' },
   { name: 'RADIO HEIGHT',                 unit: 'feet',    key: 'A_RADIO_ALT' },
-  //{ name: 'SPOILERS_LEVER_ARM-DISARM',    unit: 'bool',    key: 'A_FC_SPEEDBRAKE' },
+  { name: 'AIRSPEED INDICATED',            unit: 'knots',   key: 'A_AIRSPEED' },
+  { name: 'ENG N2 RPM:1',                  unit: 'percent', key: 'A_ENG1_N2' },
+  { name: 'ENG N2 RPM:2',                  unit: 'percent', key: 'A_ENG2_N2' },
+  { name: 'SPOILERS_LEVER_ARM-DISARM',    unit: 'bool',    key: 'A_FC_SPEEDBRAKE' },
 ];
 
 let simValues = {};
@@ -113,9 +118,6 @@ SIMVARS.forEach(sv => simValues[sv.key] = 0);
 AAO_LVARS.forEach(n => simValues[n] = 0);
 
 const clients = new Set();
-
-// ─── Checklist State Sync ───
-let checklistState = { state: {}, phaseIdx: 0 }; // Gemeinsamer State aller Clients
 function broadcast() {
   const msg = JSON.stringify({ type: 'lvar_update', values: simValues });
   clients.forEach(c => { if (c.readyState === WebSocket.OPEN) c.send(msg); });
@@ -139,25 +141,12 @@ wss.on('connection', ws => {
   ws.send(JSON.stringify({ type: 'lvar_update', values: simValues }));
   // IP + Tablet-URL senden
   ws.send(JSON.stringify({ type: 'server_info', ip: getLocalIP(), port: 8766 }));
-  // Aktuellen State an neuen Client senden
-  ws.send(JSON.stringify({ type: 'state_sync', ...checklistState }));
-
   ws.on('message', (msg) => {
     try {
       const data = JSON.parse(msg);
       if (data.type === 'set_chr') {
         chrEnabled = !!data.enabled;
         console.log('[CHR] Auto-Trigger ' + (chrEnabled ? 'aktiviert' : 'deaktiviert'));
-      }
-      // State-Update von einem Client → speichern + an alle anderen weiterleiten
-      if (data.type === 'state_update') {
-        checklistState = { state: data.state, phaseIdx: data.phaseIdx };
-        // An alle anderen Clients weiterleiten (nicht zurück an Absender)
-        clients.forEach(c => {
-          if (c !== ws && c.readyState === WebSocket.OPEN) {
-            c.send(JSON.stringify({ type: 'state_sync', state: data.state, phaseIdx: data.phaseIdx }));
-          }
-        });
       }
     } catch(e) {}
   });

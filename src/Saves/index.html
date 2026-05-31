@@ -494,6 +494,26 @@
             <div class="toggle-slider"></div>
           </label>
         </div>
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">FL100 Callout – Steigflug</div>
+            <div class="setting-sub">"Ten thousand feet, lights off"</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="tog-callout-climb" onchange="saveSettings()">
+            <div class="toggle-slider"></div>
+          </label>
+        </div>
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">FL100 Callout – Sinkflug</div>
+            <div class="setting-sub">"Ten thousand feet, lights on"</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="tog-callout-descent" onchange="saveSettings()">
+            <div class="toggle-slider"></div>
+          </label>
+        </div>
 
         <div class="setting-row">
           <div>
@@ -619,6 +639,16 @@
             <option value="de-DE">Deutsch</option>
           </select>
         </div>
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">Lautstärke</div>
+            <div class="setting-sub" id="callout-vol-label">100%</div>
+          </div>
+          <input type="range" id="inp-volume" min="0" max="200" value="100" step="10"
+            oninput="document.getElementById('callout-vol-label').textContent=this.value+'%'"
+            onchange="saveSettings()"
+            style="width:100px;accent-color:var(--accent);cursor:pointer;">
+        </div>
       </div>
 
       <div class="setting-group">
@@ -728,7 +758,7 @@ const CHECKLISTS = [
         { id:'fcu-spd',   action:'FCU SPD',                 value:'CHECK DASHED',    lvar:'B_FCU_SPEED_DASHED', lval:1, noAutoOnStart: true },
         { id:'fcu-hdg',   action:'FCU HDG',                 value:'CHECK DASHED',    lvar:'B_FCU_HEADING_DASHED', lval:1, noAutoOnStart: true },
         { id:'fcu-alt',   action:'FCU ALT SEL',             value:'SET ALTITUDE',    lvar:null },
-        { id:'thr-idle',  action:'Thrust Levers',           value:'IDLE',            lvar:'A_FC_THROTTLE_LEFT_INPUT', lval:2, noAutoOnStart: true, lvar2:'A_FC_THROTTLE_RIGHT_INPUT', lval2:2, noAutoOnStart: true },
+        { id:'thr-idle',  action:'Thrust Levers',           value:'IDLE',            lvar:'A_FC_THROTTLE_LEFT_INPUT', lval:2, lvar2:'A_FC_THROTTLE_RIGHT_INPUT', lval2:2 },
         { id:'pws',       action:'Pred. Windshear PWS',     value:'OFF',             lvar:'S_WR_PRED_WS', lval:0 },
         { id:'wx-on',     action:'Weather Radar',           value:'OFF',             lvar:'S_WR_SYS', lval:1 },
 		    // My S_XPDR_OPERATION = 1 ist: Auto
@@ -768,21 +798,22 @@ const CHECKLISTS = [
         { id:'eng-norm',  action:'ENG Mode Selector',       value:'NORM',            lvar:'S_ENG_MODE', lval:1 },
         { id:'apu-bl-off',action:'APU Bleed',               value:'OFF',             lvar:'S_OH_PNEUMATIC_APU_BLEED', lval:0 },
         { id:'apu-off',   action:'APU Master',              value:'OFF',             lvar:'I_OH_ELEC_APU_MASTER_L', lval:0 },
+        { id:'anti-ice2', action:'ANTI ICE',                value:'AS REQ 10°C',     lvar:null },
         { id:'anti-ice',  action:'Engine & Wing Anti-Ice',  value:'AS REQ',          lvar:null },
         { id:'autobrk',   action:'Auto Brake',              value:'MAX',             lvar:'I_MIP_AUTOBRAKE_MAX_L', lval:1 },
-        { id:'pws',       action:'Pred. Windshear PWS',     value:'ON',              lvar:'S_WR_PRED_WS', lval:0, noAutoOnStart: true },
-        { id:'wx-on',     action:'Weather Radar',           value:'ON',              lvar:'S_WR_SYS', lval:1, noAutoOnStart: true },
+        { id:'pws3',       action:'Pred. Windshear PWS',    value:'ON',              lvar:'S_WR_PRED_WS', lval:1, noAutoOnStart: true },
+        { id:'wx-on3',     action:'Weather Radar',          value:'ON',              lvar:'S_WR_SYS', lval:0,},
         // { id:'flaps-to', action:'Flaps SET FOR T.O.',    value:'AS CALCULATED',   lvar:'S_FC_FLAPS', lval:null },
-		    { id:'flaps-to',  action:'Flaps SET FOR T.O.',       value:'AS CALCULATED',  lvar:'S_FC_FLAPS', lgt:0 },
-        { id:'spoilers',  action:'Ground Spoilers',         value:'ARM',             lvar:'A_FC_SPEEDBRAKE', lval:0, noAutoOnStart: true },
+		    { id:'flaps-to',  action:'Flaps SET FOR T.O.',      value:'AS CALCULATED',   lvar:'S_FC_FLAPS', lgt:0 },
+        { id:'spoilers3',  action:'Ground Spoilers',        value:'ARM',             lvar:'A_FC_SPEEDBRAKE', lval:0, noAutoOnStart: true },
         { id:'rud-trim',  action:'Rudder & Aileron Trim',   value:'ZERO',            lvar:'S_FC_RUDDER_TRIM_RESET', lgt:0 },
         //{ id:'rud-trim',  action:'Rudder & Aileron Trim',    value:'ZERO',           lvar:'A_FC_RUDDER_TRIM', lval:1 },
         // { id:'pit-trim',  action:'Pitch Trim',              value:'AS CALCULATED',   lvar:null },
-		    { id:'trim-set',  action:'Elevator Trim',            value:'SET',            lvar:'A_FC_ELEVATOR_TRIM', lval:'A_FC_ELEVATOR_TRIM' },
+		    { id:'trim-set',  action:'Elevator Trim',           value:'SET',             lvar:'A_FC_ELEVATOR_TRIM', lval:'A_FC_ELEVATOR_TRIM' },
+        { id:'terr-on',  action:'Terrain On ND',            value:'ON',              lvar:'I_MIP_GPWS_TERRAIN_ON_ND_CAPT_L', lval:1 },
         { id:'flt-ctrl',  action:'Flight Controls',         value:'FREE MOVEMENT',   lvar:null },
-        { id:'anti-ice2', action:'ANTI ICE',                value:'AS REQ 10°C',     lvar:null },
         { id:'ecam-stat', action:'ECAM STATUS',             value:'CHECKED',         lvar:null },
-        { id:'to-config', action:'TO Config Test',          value:'PUSH',            lvar:'I_ECAM_TO', lval:1 },
+        { id:'to-config', action:'TO Config Test',          value:'PUSH',            lvar:null },
       ]
     }]
   },
@@ -838,7 +869,7 @@ const CHECKLISTS = [
       items: [
         { id:'ldg-off',   action:'Landing Lights',          value:'OFF',             lvar:'A_LT_LANDING', lval:0 },
         { id:'nose-off',  action:'Nose Light',              value:'OFF',             lvar:'S_OH_EXT_LT_NOSE', lval:0 },
-        { id:'terr-off',  action:'Terrain On ND',           value:'OFF',             lvar:null },
+        { id:'terr-off',  action:'Terrain On ND',           value:'OFF',             lvar:'I_MIP_GPWS_TERRAIN_ON_ND_CAPT_L', lval:0 },
         { id:'pax-signs', action:'Passenger Signs',         value:'AS REQ',          lvar:null },
       ]
     }]
@@ -852,7 +883,7 @@ const CHECKLISTS = [
         { id:'nose-on2',  action:'Nose Light',              value:'ON',              lvar:'S_OH_EXT_LT_NOSE', lval:2 },
         { id:'pax-signs2',action:'Passenger Signs',         value:'AS REQ',          lvar:'A_SEATBELTS', lval:1 },
         //{ id:'spd-arm2',  action:'Ground Spoilers',         value:'ARM',             lvar:'A_SPOILERS_ARM', lval:1 },
-        { id:'spoilers',  action:'Ground Spoilers',         value:'ARM',             lvar:'A_FC_SPEEDBRAKE', lval:0, noAutoOnStart: true },
+        { id:'spoilers_', action:'Ground Spoilers',         value:'DISARM',          lvar:'A_FC_SPEEDBRAKE', lval:1, noAutoOnStart: true },
         { id:'autobrk2',  action:'AUTO BRK',                value:'SET MED',         lvar:'I_MIP_AUTOBRAKE_MED_L', lval:1 },
         { id:'ecam-ldg',  action:'ECAM MEMO',               value:'LDG NO BLUE',     lvar:null },
       ]
@@ -875,7 +906,7 @@ const CHECKLISTS = [
     sections: [{
       title: 'AFTER LANDING',
       items: [
-        { id:'spd-dis2',  action:'Ground Spoilers',         value:'DISARM',          lvar:'A_SPOILERS_ARM', lval:1, noAutoOnStart: true },
+        { id:'spd-dis2',  action:'Ground Spoilers',         value:'DISARM',          llvar:'A_FC_SPEEDBRAKE', lval:1 },
         { id:'flap-ret2', action:'Flaps',                   value:'RETRACT',         lvar:'S_FC_FLAPS', lval:0 },
         { id:'nose-off2', action:'Nose Light',              value:'OFF',             lvar:'S_OH_EXT_LT_NOSE', lval:0 },
         { id:'ldg-off2',  action:'Landing Lights',          value:'OFF',             lvar:'A_LT_LANDING', lval:0 },
@@ -885,7 +916,7 @@ const CHECKLISTS = [
         //{ id:'ldg-off',   action:'Landing Lights',          value:'OFF',             lvar:'A_LT_LANDING', lval:0 },
         //{ id:'nose-off',  action:'Nose Light',              value:'OFF',             lvar:'S_OH_EXT_LT_NOSE', lval:0 }
         { id:'ldg-off_',  action:'Landing Lights',          value:'OFF',             lvar:'A_LT_LANDING', lval:0 },
-        { id:'nose-off_', action:'Nose Light',              value:'OFF',             lvar:'S_OH_EXT_LT_NOSE', lval:0 },
+        //{ id:'nose-off_', action:'Nose Light',              value:'OFF',             lvar:'S_OH_EXT_LT_NOSE', lval:0 },
         { id:'apu-bl2',   action:'APU Bleed (nach AVAIL)',  value:'ON',              lvar:'S_OH_PNEUMATIC_APU_BLEED', lval:1 },
       ]
     }]
@@ -897,10 +928,10 @@ const CHECKLISTS = [
       items: [
         { id:'pk-brk2',   action:'PARK BRK / CHOCKS',       value:'SET',             lvar:'A_PARK_BRAKE', lval:1 },
         //{ id:'eng-off',   action:'ENGINES',                  value:'OFF',             lvar:'A_ENG1_MASTER', lval:0 },
-        { id:'eng1-mst',  action:'ENG 1 Master Switch',     value:'OFF',              lvar:'S_ENG_MASTER_1', lval:1, noAutoOnStart: true },
-        { id:'eng2-mst',  action:'ENG 2 Master Switch',     value:'OFF',              lvar:'S_ENG_MASTER_2', lval:1, noAutoOnStart: true },
-        { id:'wing-off',  action:'WING LIGHTS',              value:'OFF',             lvar:'S_OH_EXT_LT_WING', lval:0 },
-        { id:'fuel-off',  action:'FUEL PUMPS',               value:'OFF',             lvar:'S_OH_FUEL_RIGHT_2', lval:0 },
+        { id:'eng1-mst',  action:'ENG 1 Master Switch',     value:'OFF',             lvar:'S_ENG_MASTER_1', lval:1, noAutoOnStart: true },
+        { id:'eng2-mst',  action:'ENG 2 Master Switch',     value:'OFF',             lvar:'S_ENG_MASTER_2', lval:1, noAutoOnStart: true },
+        { id:'wing-off',  action:'WING LIGHTS',             value:'OFF',             lvar:'S_OH_EXT_LT_WING', lval:0 },
+        { id:'fuel-off',  action:'FUEL PUMPS',              value:'OFF',             lvar:'S_OH_FUEL_RIGHT_2', lval:0 },
       ]
     }]
   },
@@ -934,11 +965,7 @@ function connectLVars() {
       updateLVarStatus('connected');
       const needed = getAllLVars();
       ws.send(JSON.stringify({ type:'subscribe', lvars: needed }));
-      // Snapshot nach kurzer Verzögerung nehmen (warten bis erste Werte ankommen)
-      setTimeout(() => {
-        takeSnapshot();
-        updateLVarStatus('connected');
-      }, 1500);
+      updateLVarStatus('connected');
     };
     ws.onmessage = (evt) => {
       try {
@@ -994,9 +1021,7 @@ function updateLVarStatus(status) {
   dot.className = '';
   if (status === 'connected') {
     dot.classList.add('connected');
-    text.textContent = lvarSnapshot
-      ? 'L-VARs: VERBUNDEN – AUTO-CHECK AKTIV'
-      : 'L-VARs: VERBUNDEN – Snapshot lädt...';
+    text.textContent = 'L-VARs: VERBUNDEN – AUTO-CHECK AKTIV';
     btn.textContent = 'TRENNEN';
     btn.onclick = () => { ws && ws.close(); };
   } else if (status === 'connecting') {
@@ -1022,69 +1047,56 @@ function getAllLVars() {
   return [...names];
 }
 
-// ─── Snapshot System ───
-let lvarSnapshot = null; // Startwerte beim ersten Verbinden
-
+// ─── Kein Snapshot – direkte L-VAR Prüfung ───
 function takeSnapshot() {
-  lvarSnapshot = { ...lvarValues };
-  console.log('[SNAPSHOT] Startwerte gespeichert:', Object.keys(lvarSnapshot).length, 'Variablen');
+  CHECKLISTS.forEach(ph => ph.sections.forEach(s => s.items.forEach(i => {
+    if (state[i.id] === 'auto') state[i.id] = false;
+  })));
 }
 
 function checkAutoItems() {
-  if (!lvarSnapshot) return;
-
   let anyChanged = false;
   CHECKLISTS.forEach(ph => ph.sections.forEach(s => s.items.forEach(i => {
-    if (!i.lvar || (i.lval === null && i.lgt === undefined)) return;
+    if (!i.lvar) return;
     if (!(i.lvar in lvarValues)) return;
-
-    const actual  = Math.round(Number(lvarValues[i.lvar]));
-    const snap    = Math.round(Number(lvarSnapshot[i.lvar] ?? actual));
-    let matches = i.lgt !== undefined ? (actual > i.lgt) : (actual === i.lval);
-    // Doppel-Check: lvar2/lval2
+    const actual = Math.round(Number(lvarValues[i.lvar]));
+    const rawVal = Number(lvarValues[i.lvar]);
+    let matches = i.lgt   !== undefined ? (actual > i.lgt)
+               : i.llt   !== undefined ? (rawVal < i.llt)
+               : i.lnear !== undefined ? (Math.abs(rawVal - i.lnear) <= (i.ltol ?? 1))
+               : i.lodd  !== undefined ? (actual % 2 === 1)
+               : i.leven !== undefined ? (actual % 2 === 0 && actual > 0)
+               : (actual === i.lval);
     if (matches && i.lvar2 && i.lvar2 in lvarValues) {
-      const actual2 = Math.round(Number(lvarValues[i.lvar2]));
-      matches = (actual2 === i.lval2);
+      const raw2 = Number(lvarValues[i.lvar2]);
+      matches = i.llt2  !== undefined ? (raw2 < i.llt2)
+              : i.lnear !== undefined ? (Math.abs(raw2 - i.lnear) <= (i.ltol ?? 1))
+              : (Math.round(raw2) === i.lval2);
     }
-
-    // Item abhaken wenn Sollwert erreicht
     const prevState = state[i.id];
-    // noAutoOnStart: nur abhaken wenn Wert sich seit Snapshot geändert hat
-    if (i.noAutoOnStart && actual === snap) return;
     if (matches && prevState !== 'auto' && prevState !== true) {
       state[i.id] = 'auto';
       updateItemDOM(i.id, 'auto', actual);
       anyChanged = true;
-      // APU Master → 3s Timer für apu-start
       if (i.id === 'apu-mstr') {
         setTimeout(() => {
           if (state['apu-mstr']) {
             state['apu-start'] = true;
-            saveState();
-            render();
+            saveState(); render();
             setTimeout(() => scrollToNextOpen(), 150);
           }
         }, 3000);
       }
     } else if (!matches && prevState === 'auto') {
-      // Nur zurücksetzen wenn sich der Wert seit Snapshot geändert hat
-      // (verhindert dass Items die beim Start schon falsch waren zurückgesetzt werden)
-      if (actual !== snap) {
-        state[i.id] = false;
-        updateItemDOM(i.id, false, actual);
-        anyChanged = true;
-      }
+      state[i.id] = false;
+      updateItemDOM(i.id, false, actual);
+      anyChanged = true;
     } else {
       updateItemValue(i.id, actual);
     }
   })));
-  if (anyChanged) {
-    saveState();
-    renderTabs();
-    renderProgress();
-  }
+  if (anyChanged) { saveState(); renderTabs(); renderProgress(); }
 }
-
 // Einzelnes Item im DOM updaten ohne alles neu zu rendern
 function updateItemDOM(id, newState, actualVal) {
   const el = document.getElementById('item-' + id);
@@ -1269,13 +1281,12 @@ let state = {};
 let currentPhaseIdx = 0;
 
 function initState() {
-  try {
-    const saved = localStorage.getItem('fenix-cl-v2');
-    if (saved) state = JSON.parse(saved);
-  } catch(e) { state = {}; }
+  // Beim App-Start immer komplett zurücksetzen
+  state = {};
   CHECKLISTS.forEach(ph => ph.sections.forEach(s => s.items.forEach(i => {
-    if (!(i.id in state)) state[i.id] = false;
+    state[i.id] = false;
   })));
+  localStorage.setItem('fenix-cl-v2', JSON.stringify(state));
 }
 
 function saveState() {
@@ -1459,6 +1470,8 @@ function scrollTabs(dir) {
 let settings = {
   climbWarn: false,
   descentWarn: false,
+  calloutClimb: false,
+  calloutDescent: false,
   autoClose: false,
   autoConnect: true,
   sound: false,
@@ -1468,6 +1481,7 @@ let settings = {
   v1: 145,
   vr: 150,
   calloutLang: 'en-US',
+  calloutVol: 100,
 };
 
 function resetAllChecklists() {
@@ -1492,8 +1506,10 @@ function closeSettings() {
   document.getElementById('settings-overlay').classList.remove('open');
 }
 function saveSettings() {
-  settings.climbWarn   = document.getElementById('tog-climb').checked;
-  settings.descentWarn = document.getElementById('tog-descent').checked;
+  settings.climbWarn      = document.getElementById('tog-climb').checked;
+  settings.descentWarn    = document.getElementById('tog-descent').checked;
+  settings.calloutClimb   = document.getElementById('tog-callout-climb').checked;
+  settings.calloutDescent = document.getElementById('tog-callout-descent').checked;
   settings.autoClose   = document.getElementById('tog-autoclose').checked;
   settings.autoConnect = document.getElementById('tog-autoconnect').checked;
   settings.sound       = document.getElementById('tog-sound').checked;
@@ -1503,6 +1519,7 @@ function saveSettings() {
   settings.v1           = parseInt(document.getElementById('inp-v1').value) || 145;
   settings.vr           = parseInt(document.getElementById('inp-vr').value) || 150;
   settings.calloutLang  = document.getElementById('sel-voice').value;
+  settings.calloutVol   = parseInt(document.getElementById('inp-volume').value) || 100;
   localStorage.setItem('fenix-settings', JSON.stringify(settings));
   // Bridge sofort informieren
   if (ws && ws.readyState === WebSocket.OPEN) {
@@ -1514,8 +1531,10 @@ function loadSettings() {
     const s = JSON.parse(localStorage.getItem('fenix-settings') || '{}');
     settings = { ...settings, ...s };
   } catch(e) {}
-  document.getElementById('tog-climb').checked      = settings.climbWarn;
-  document.getElementById('tog-descent').checked    = settings.descentWarn;
+  document.getElementById('tog-climb').checked           = settings.climbWarn;
+  document.getElementById('tog-descent').checked         = settings.descentWarn;
+  document.getElementById('tog-callout-climb').checked   = settings.calloutClimb ?? false;
+  document.getElementById('tog-callout-descent').checked = settings.calloutDescent ?? false;
   document.getElementById('tog-autoclose').checked  = settings.autoClose;
   document.getElementById('tog-autoconnect').checked= settings.autoConnect;
   document.getElementById('tog-sound').checked      = settings.sound;
@@ -1525,6 +1544,9 @@ function loadSettings() {
   document.getElementById('inp-v1').value           = settings.v1 ?? 145;
   document.getElementById('inp-vr').value           = settings.vr ?? 150;
   document.getElementById('sel-voice').value        = settings.calloutLang ?? 'en-US';
+  const vol = settings.calloutVol ?? 100;
+  document.getElementById('inp-volume').value       = vol;
+  document.getElementById('callout-vol-label').textContent = vol + '%';
 }
 
 // ─── Audio Engine ───
@@ -1567,6 +1589,12 @@ function playChime(type) {
 // ─── CALLOUT ENGINE ───
 const CALLOUT_FLAP_NAMES = ['Flaps Up', 'Flaps 1', 'Flaps 2', 'Flaps 3', 'Flaps Full'];
 
+// APU Callout Tracking
+let apuCalloutDone = false;
+
+// Engine Start/Alive Tracking
+let engCalloutState = { eng1start:false, eng1alive:false, eng2start:false, eng2alive:false };
+
 let calloutState = {
   lastFlap:       -1,   // letzte bekannte Klappenstellung
   said100kt:      false,
@@ -1596,7 +1624,7 @@ function processCalloutQueue() {
   utt.lang  = settings.calloutLang ?? 'en-US';
   utt.rate  = 1.1;
   utt.pitch = 0.9;
-  utt.volume = 1.0;
+  utt.volume = Math.min(1.0, (settings.calloutVol ?? 100) / 100);
   utt.onend = () => setTimeout(processCalloutQueue, 200);
   utt.onerror = () => setTimeout(processCalloutQueue, 200);
   speechSynthesis.speak(utt);
@@ -1684,6 +1712,32 @@ function checkCallouts() {
     }
   }
 
+  // ── APU Available Callout ──
+  if (settings.engCallout) {
+    const apuN = lvarValues['A_APU_N'] ?? 0;
+    const apuMaster = lvarValues['I_OH_ELEC_APU_MASTER_L'] ?? 0;
+    if (!apuCalloutDone && apuMaster === 1 && apuN > 95) {
+      apuCalloutDone = true;
+      calloutSpeak('APU available');
+    }
+    if (apuMaster === 0) apuCalloutDone = false; // Reset wenn Master AUS
+  }
+
+  // ── Engine Start / Alive Callouts ──
+  if (settings.engCallout) {
+    const n2_1 = lvarValues['A_ENG1_N2']      ?? 0;
+    const n2_2 = lvarValues['A_ENG2_N2']      ?? 0;
+    const mst1 = lvarValues['S_ENG_MASTER_1'] ?? 1;
+    const mst2 = lvarValues['S_ENG_MASTER_2'] ?? 1;
+    if (!engCalloutState.eng2start && mst2 === 0) { engCalloutState.eng2start = true; calloutSpeak('Engine 2 start'); }
+    if (!engCalloutState.eng2alive && n2_2 > 58)  { engCalloutState.eng2alive = true; calloutSpeak('Engine 2 alive'); }
+    if (!engCalloutState.eng1start && mst1 === 0) { engCalloutState.eng1start = true; calloutSpeak('Engine 1 start'); }
+    if (!engCalloutState.eng1alive && n2_1 > 58)  { engCalloutState.eng1alive = true; calloutSpeak('Engine 1 alive'); }
+    if (mst1 === 1 && mst2 === 1 && (engCalloutState.eng1start || engCalloutState.eng2start)) {
+      engCalloutState = { eng1start:false, eng1alive:false, eng2start:false, eng2alive:false };
+    }
+  }
+
   // ── Reset nach Landung ──
   if (onGround && calloutState.saidRotate) {
     // Kurz nach Touchdown alles zurücksetzen
@@ -1744,6 +1798,7 @@ function checkAltitudeWarning() {
       warn.className = 'climb';
       warn.innerHTML = `↑ ${bucket.toLocaleString()} ft – LANDING LIGHTS OFF · NOSE OFF`;
       playChime('climb');
+      if (settings.calloutClimb) calloutSpeak('Ten thousand feet, lights off');
       startAutoClose();
     }
   }
@@ -1754,6 +1809,7 @@ function checkAltitudeWarning() {
       warn.className = 'descent';
       warn.innerHTML = `↓ ${bucket.toLocaleString()} ft – LANDING LIGHTS ON · NOSE ON`;
       playChime('descent');
+      if (settings.calloutDescent) calloutSpeak('Ten thousand feet, lights on');
       startAutoClose();
     }
   }

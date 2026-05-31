@@ -1,4 +1,3 @@
-# Fenix A320 Checkliste – In-Game Tablet App
 <!DOCTYPE html>
 <html lang="de">
 <head>
@@ -756,8 +755,8 @@ const CHECKLISTS = [
         { id:'baro-ref',  action:'Altimeter Baro Ref',      value:'SET',             lvar:null },
         //{ id:'fd-btn',    action:'FD Button CHECK',         value:'ON',              lvar:'I_FCU_EFIS1_FD', lval:1 },
         { id:'fd-btn',    action:'FD Button CHECK',         value:'ON',              lvar:'I_FCU_EFIS1_FD', lval:1, noAutoOnStart: true },
-        { id:'fcu-spd',   action:'FCU SPD',                 value:'CHECK DASHED',    lvar:'B_FCU_SPEED_DASHED', lval:1,  lval:1, noAutoOnStart: true },
-        { id:'fcu-hdg',   action:'FCU HDG',                 value:'CHECK DASHED',    lvar:'B_FCU_HEADING_DASHED', lval:1, lval:1, noAutoOnStart: true },
+        { id:'fcu-spd',   action:'FCU SPD',                 value:'CHECK DASHED',    lvar:'B_FCU_SPEED_DASHED', lval:1, noAutoOnStart: true },
+        { id:'fcu-hdg',   action:'FCU HDG',                 value:'CHECK DASHED',    lvar:'B_FCU_HEADING_DASHED', lval:1, noAutoOnStart: true },
         { id:'fcu-alt',   action:'FCU ALT SEL',             value:'SET ALTITUDE',    lvar:null },
         { id:'thr-idle',  action:'Thrust Levers',           value:'IDLE',            lvar:'A_FC_THROTTLE_LEFT_INPUT', lval:2, lvar2:'A_FC_THROTTLE_RIGHT_INPUT', lval2:2 },
         { id:'pws',       action:'Pred. Windshear PWS',     value:'OFF',             lvar:'S_WR_PRED_WS', lval:0 },
@@ -799,21 +798,22 @@ const CHECKLISTS = [
         { id:'eng-norm',  action:'ENG Mode Selector',       value:'NORM',            lvar:'S_ENG_MODE', lval:1 },
         { id:'apu-bl-off',action:'APU Bleed',               value:'OFF',             lvar:'S_OH_PNEUMATIC_APU_BLEED', lval:0 },
         { id:'apu-off',   action:'APU Master',              value:'OFF',             lvar:'I_OH_ELEC_APU_MASTER_L', lval:0 },
+        { id:'anti-ice2', action:'ANTI ICE',                value:'AS REQ 10°C',     lvar:null },
         { id:'anti-ice',  action:'Engine & Wing Anti-Ice',  value:'AS REQ',          lvar:null },
         { id:'autobrk',   action:'Auto Brake',              value:'MAX',             lvar:'I_MIP_AUTOBRAKE_MAX_L', lval:1 },
-        { id:'pws',       action:'Pred. Windshear PWS',     value:'ON',              lvar:'S_WR_PRED_WS', lval:0, noAutoOnStart: true },
-        { id:'wx-on',     action:'Weather Radar',           value:'ON',              lvar:'S_WR_SYS', lval:1, noAutoOnStart: true },
+        { id:'pws3',       action:'Pred. Windshear PWS',    value:'ON',              lvar:'S_WR_PRED_WS', lval:1, noAutoOnStart: true },
+        { id:'wx-on3',     action:'Weather Radar',          value:'ON',              lvar:'S_WR_SYS', lval:0,},
         // { id:'flaps-to', action:'Flaps SET FOR T.O.',    value:'AS CALCULATED',   lvar:'S_FC_FLAPS', lval:null },
-		    { id:'flaps-to',  action:'Flaps SET FOR T.O.',       value:'AS CALCULATED',  lvar:'S_FC_FLAPS', lgt:0 },
-        { id:'spoilers',  action:'Ground Spoilers',         value:'ARM',             lvar:'A_FC_SPEEDBRAKE', lval:0, noAutoOnStart: true },
+		    { id:'flaps-to',  action:'Flaps SET FOR T.O.',      value:'AS CALCULATED',   lvar:'S_FC_FLAPS', lgt:0 },
+        { id:'spoilers3',  action:'Ground Spoilers',        value:'ARM',             lvar:'A_FC_SPEEDBRAKE', lval:0, noAutoOnStart: true },
         { id:'rud-trim',  action:'Rudder & Aileron Trim',   value:'ZERO',            lvar:'S_FC_RUDDER_TRIM_RESET', lgt:0 },
         //{ id:'rud-trim',  action:'Rudder & Aileron Trim',    value:'ZERO',           lvar:'A_FC_RUDDER_TRIM', lval:1 },
         // { id:'pit-trim',  action:'Pitch Trim',              value:'AS CALCULATED',   lvar:null },
-		    { id:'trim-set',  action:'Elevator Trim',            value:'SET',            lvar:'A_FC_ELEVATOR_TRIM', lval:'A_FC_ELEVATOR_TRIM' },
+		    { id:'trim-set',  action:'Elevator Trim',           value:'SET',             lvar:'A_FC_ELEVATOR_TRIM', lval:'A_FC_ELEVATOR_TRIM' },
+        { id:'terr-on',  action:'Terrain On ND',            value:'ON',              lvar:'I_MIP_GPWS_TERRAIN_ON_ND_CAPT_L', lval:1 },
         { id:'flt-ctrl',  action:'Flight Controls',         value:'FREE MOVEMENT',   lvar:null },
-        { id:'anti-ice2', action:'ANTI ICE',                value:'AS REQ 10°C',     lvar:null },
         { id:'ecam-stat', action:'ECAM STATUS',             value:'CHECKED',         lvar:null },
-        { id:'to-config', action:'TO Config Test',          value:'PUSH',            lvar:'I_ECAM_TO', lval:1 },
+        { id:'to-config', action:'TO Config Test',          value:'PUSH',            lvar:null },
       ]
     }]
   },
@@ -869,7 +869,7 @@ const CHECKLISTS = [
       items: [
         { id:'ldg-off',   action:'Landing Lights',          value:'OFF',             lvar:'A_LT_LANDING', lval:0 },
         { id:'nose-off',  action:'Nose Light',              value:'OFF',             lvar:'S_OH_EXT_LT_NOSE', lval:0 },
-        { id:'terr-off',  action:'Terrain On ND',           value:'OFF',             lvar:null },
+        { id:'terr-off',  action:'Terrain On ND',           value:'OFF',             lvar:'I_MIP_GPWS_TERRAIN_ON_ND_CAPT_L', lval:0 },
         { id:'pax-signs', action:'Passenger Signs',         value:'AS REQ',          lvar:null },
       ]
     }]
@@ -883,7 +883,7 @@ const CHECKLISTS = [
         { id:'nose-on2',  action:'Nose Light',              value:'ON',              lvar:'S_OH_EXT_LT_NOSE', lval:2 },
         { id:'pax-signs2',action:'Passenger Signs',         value:'AS REQ',          lvar:'A_SEATBELTS', lval:1 },
         //{ id:'spd-arm2',  action:'Ground Spoilers',         value:'ARM',             lvar:'A_SPOILERS_ARM', lval:1 },
-        { id:'spoilers',  action:'Ground Spoilers',         value:'ARM',             lvar:'A_FC_SPEEDBRAKE', lval:0, noAutoOnStart: true },
+        { id:'spoilers_', action:'Ground Spoilers',         value:'DISARM',          lvar:'A_FC_SPEEDBRAKE', lval:1, noAutoOnStart: true },
         { id:'autobrk2',  action:'AUTO BRK',                value:'SET MED',         lvar:'I_MIP_AUTOBRAKE_MED_L', lval:1 },
         { id:'ecam-ldg',  action:'ECAM MEMO',               value:'LDG NO BLUE',     lvar:null },
       ]
@@ -906,7 +906,7 @@ const CHECKLISTS = [
     sections: [{
       title: 'AFTER LANDING',
       items: [
-        { id:'spd-dis2',  action:'Ground Spoilers',         value:'DISARM',          lvar:'A_SPOILERS_ARM', lval:1, noAutoOnStart: true },
+        { id:'spd-dis2',  action:'Ground Spoilers',         value:'DISARM',          llvar:'A_FC_SPEEDBRAKE', lval:1 },
         { id:'flap-ret2', action:'Flaps',                   value:'RETRACT',         lvar:'S_FC_FLAPS', lval:0 },
         { id:'nose-off2', action:'Nose Light',              value:'OFF',             lvar:'S_OH_EXT_LT_NOSE', lval:0 },
         { id:'ldg-off2',  action:'Landing Lights',          value:'OFF',             lvar:'A_LT_LANDING', lval:0 },
@@ -916,7 +916,7 @@ const CHECKLISTS = [
         //{ id:'ldg-off',   action:'Landing Lights',          value:'OFF',             lvar:'A_LT_LANDING', lval:0 },
         //{ id:'nose-off',  action:'Nose Light',              value:'OFF',             lvar:'S_OH_EXT_LT_NOSE', lval:0 }
         { id:'ldg-off_',  action:'Landing Lights',          value:'OFF',             lvar:'A_LT_LANDING', lval:0 },
-        { id:'nose-off_', action:'Nose Light',              value:'OFF',             lvar:'S_OH_EXT_LT_NOSE', lval:0 },
+        //{ id:'nose-off_', action:'Nose Light',              value:'OFF',             lvar:'S_OH_EXT_LT_NOSE', lval:0 },
         { id:'apu-bl2',   action:'APU Bleed (nach AVAIL)',  value:'ON',              lvar:'S_OH_PNEUMATIC_APU_BLEED', lval:1 },
       ]
     }]
@@ -928,10 +928,10 @@ const CHECKLISTS = [
       items: [
         { id:'pk-brk2',   action:'PARK BRK / CHOCKS',       value:'SET',             lvar:'A_PARK_BRAKE', lval:1 },
         //{ id:'eng-off',   action:'ENGINES',                  value:'OFF',             lvar:'A_ENG1_MASTER', lval:0 },
-        { id:'eng1-mst',  action:'ENG 1 Master Switch',     value:'OFF',              lvar:'S_ENG_MASTER_1', lval:1, noAutoOnStart: true },
-        { id:'eng2-mst',  action:'ENG 2 Master Switch',     value:'OFF',              lvar:'S_ENG_MASTER_2', lval:1, noAutoOnStart: true },
-        { id:'wing-off',  action:'WING LIGHTS',              value:'OFF',             lvar:'S_OH_EXT_LT_WING', lval:0 },
-        { id:'fuel-off',  action:'FUEL PUMPS',               value:'OFF',             lvar:'S_OH_FUEL_RIGHT_2', lval:0 },
+        { id:'eng1-mst',  action:'ENG 1 Master Switch',     value:'OFF',             lvar:'S_ENG_MASTER_1', lval:1, noAutoOnStart: true },
+        { id:'eng2-mst',  action:'ENG 2 Master Switch',     value:'OFF',             lvar:'S_ENG_MASTER_2', lval:1, noAutoOnStart: true },
+        { id:'wing-off',  action:'WING LIGHTS',             value:'OFF',             lvar:'S_OH_EXT_LT_WING', lval:0 },
+        { id:'fuel-off',  action:'FUEL PUMPS',              value:'OFF',             lvar:'S_OH_FUEL_RIGHT_2', lval:0 },
       ]
     }]
   },
@@ -965,11 +965,7 @@ function connectLVars() {
       updateLVarStatus('connected');
       const needed = getAllLVars();
       ws.send(JSON.stringify({ type:'subscribe', lvars: needed }));
-      // Snapshot nach kurzer Verzögerung nehmen (warten bis erste Werte ankommen)
-      setTimeout(() => {
-        takeSnapshot();
-        updateLVarStatus('connected');
-      }, 1500);
+      updateLVarStatus('connected');
     };
     ws.onmessage = (evt) => {
       try {
@@ -1025,9 +1021,7 @@ function updateLVarStatus(status) {
   dot.className = '';
   if (status === 'connected') {
     dot.classList.add('connected');
-    text.textContent = lvarSnapshot
-      ? 'L-VARs: VERBUNDEN – AUTO-CHECK AKTIV'
-      : 'L-VARs: VERBUNDEN – Snapshot lädt...';
+    text.textContent = 'L-VARs: VERBUNDEN – AUTO-CHECK AKTIV';
     btn.textContent = 'TRENNEN';
     btn.onclick = () => { ws && ws.close(); };
   } else if (status === 'connecting') {
@@ -1053,69 +1047,56 @@ function getAllLVars() {
   return [...names];
 }
 
-// ─── Snapshot System ───
-let lvarSnapshot = null; // Startwerte beim ersten Verbinden
-
+// ─── Kein Snapshot – direkte L-VAR Prüfung ───
 function takeSnapshot() {
-  lvarSnapshot = { ...lvarValues };
-  console.log('[SNAPSHOT] Startwerte gespeichert:', Object.keys(lvarSnapshot).length, 'Variablen');
+  CHECKLISTS.forEach(ph => ph.sections.forEach(s => s.items.forEach(i => {
+    if (state[i.id] === 'auto') state[i.id] = false;
+  })));
 }
 
 function checkAutoItems() {
-  if (!lvarSnapshot) return;
-
   let anyChanged = false;
   CHECKLISTS.forEach(ph => ph.sections.forEach(s => s.items.forEach(i => {
-    if (!i.lvar || (i.lval === null && i.lgt === undefined)) return;
+    if (!i.lvar) return;
     if (!(i.lvar in lvarValues)) return;
-
-    const actual  = Math.round(Number(lvarValues[i.lvar]));
-    const snap    = Math.round(Number(lvarSnapshot[i.lvar] ?? actual));
-    let matches = i.lgt !== undefined ? (actual > i.lgt) : (actual === i.lval);
-    // Doppel-Check: lvar2/lval2
+    const actual = Math.round(Number(lvarValues[i.lvar]));
+    const rawVal = Number(lvarValues[i.lvar]);
+    let matches = i.lgt   !== undefined ? (actual > i.lgt)
+               : i.llt   !== undefined ? (rawVal < i.llt)
+               : i.lnear !== undefined ? (Math.abs(rawVal - i.lnear) <= (i.ltol ?? 1))
+               : i.lodd  !== undefined ? (actual % 2 === 1)
+               : i.leven !== undefined ? (actual % 2 === 0 && actual > 0)
+               : (actual === i.lval);
     if (matches && i.lvar2 && i.lvar2 in lvarValues) {
-      const actual2 = Math.round(Number(lvarValues[i.lvar2]));
-      matches = (actual2 === i.lval2);
+      const raw2 = Number(lvarValues[i.lvar2]);
+      matches = i.llt2  !== undefined ? (raw2 < i.llt2)
+              : i.lnear !== undefined ? (Math.abs(raw2 - i.lnear) <= (i.ltol ?? 1))
+              : (Math.round(raw2) === i.lval2);
     }
-
-    // Item abhaken wenn Sollwert erreicht
     const prevState = state[i.id];
-    // noAutoOnStart: nur abhaken wenn Wert sich seit Snapshot geändert hat
-    if (i.noAutoOnStart && actual === snap) return;
     if (matches && prevState !== 'auto' && prevState !== true) {
       state[i.id] = 'auto';
       updateItemDOM(i.id, 'auto', actual);
       anyChanged = true;
-      // APU Master → 3s Timer für apu-start
       if (i.id === 'apu-mstr') {
         setTimeout(() => {
           if (state['apu-mstr']) {
             state['apu-start'] = true;
-            saveState();
-            render();
+            saveState(); render();
             setTimeout(() => scrollToNextOpen(), 150);
           }
         }, 3000);
       }
     } else if (!matches && prevState === 'auto') {
-      // Nur zurücksetzen wenn sich der Wert seit Snapshot geändert hat
-      // (verhindert dass Items die beim Start schon falsch waren zurückgesetzt werden)
-      if (actual !== snap) {
-        state[i.id] = false;
-        updateItemDOM(i.id, false, actual);
-        anyChanged = true;
-      }
+      state[i.id] = false;
+      updateItemDOM(i.id, false, actual);
+      anyChanged = true;
     } else {
       updateItemValue(i.id, actual);
     }
   })));
-  if (anyChanged) {
-    saveState();
-    renderTabs();
-    renderProgress();
-  }
+  if (anyChanged) { saveState(); renderTabs(); renderProgress(); }
 }
-
 // Einzelnes Item im DOM updaten ohne alles neu zu rendern
 function updateItemDOM(id, newState, actualVal) {
   const el = document.getElementById('item-' + id);
@@ -1300,13 +1281,12 @@ let state = {};
 let currentPhaseIdx = 0;
 
 function initState() {
-  try {
-    const saved = localStorage.getItem('fenix-cl-v2');
-    if (saved) state = JSON.parse(saved);
-  } catch(e) { state = {}; }
+  // Beim App-Start immer komplett zurücksetzen
+  state = {};
   CHECKLISTS.forEach(ph => ph.sections.forEach(s => s.items.forEach(i => {
-    if (!(i.id in state)) state[i.id] = false;
+    state[i.id] = false;
   })));
+  localStorage.setItem('fenix-cl-v2', JSON.stringify(state));
 }
 
 function saveState() {
@@ -1609,6 +1589,17 @@ function playChime(type) {
 // ─── CALLOUT ENGINE ───
 const CALLOUT_FLAP_NAMES = ['Flaps Up', 'Flaps 1', 'Flaps 2', 'Flaps 3', 'Flaps Full'];
 
+// APU Callout Tracking
+let apuCalloutDone = false;
+let _apuAvailLast = -1;
+
+// Engine Start/Alive Tracking
+let engCalloutState = { eng1start:false, eng1alive:false, eng2start:false, eng2alive:false };
+let _engCalloutReady = false;
+let _engMst1Last = -1;
+let _engMst2Last = -1;
+setTimeout(() => { _engCalloutReady = true; }, 3000);
+
 let calloutState = {
   lastFlap:       -1,   // letzte bekannte Klappenstellung
   said100kt:      false,
@@ -1724,6 +1715,39 @@ function checkCallouts() {
         break;
       }
     }
+  }
+
+  // ── APU Available Callout ──
+  if (settings.engCallout) {
+    const apuAvail  = lvarValues['I_OH_ELEC_APU_START_U'] ?? 0;
+    const apuMaster = lvarValues['I_OH_ELEC_APU_MASTER_L'] ?? 0;
+    // Callout nur wenn Wert von 0 auf 1 wechselt
+    if (!apuCalloutDone && _apuAvailLast === 0 && apuAvail === 1) {
+      apuCalloutDone = true;
+      calloutSpeak('APU available');
+    }
+    _apuAvailLast = apuAvail;
+    // Reset wenn APU Master AUS
+    if (apuMaster === 0) { apuCalloutDone = false; }
+  }
+
+  // ── Engine Start / Alive Callouts ──
+  if (settings.engCallout) {
+    const n2_1 = lvarValues['A_ENG1_N2']      ?? 0;
+    const n2_2 = lvarValues['A_ENG2_N2']      ?? 0;
+    const mst1 = lvarValues['S_ENG_MASTER_1'] ?? 1;
+    const mst2 = lvarValues['S_ENG_MASTER_2'] ?? 1;
+    if (!_engCalloutReady) { _engMst1Last = mst1; _engMst2Last = mst2; return; }
+    // Callout nur wenn Master von 1 (AUS) auf 0 (EIN) wechselt
+    if (!engCalloutState.eng2start && _engMst2Last === 1 && mst2 === 0) { engCalloutState.eng2start = true; calloutSpeak('Engine 2 start'); }
+    if (!engCalloutState.eng2alive && n2_2 > 58)  { engCalloutState.eng2alive = true; calloutSpeak('Engine 2 alive'); }
+    if (!engCalloutState.eng1start && _engMst1Last === 1 && mst1 === 0) { engCalloutState.eng1start = true; calloutSpeak('Engine 1 start'); }
+    if (!engCalloutState.eng1alive && n2_1 > 58)  { engCalloutState.eng1alive = true; calloutSpeak('Engine 1 alive'); }
+    if (mst1 === 1 && mst2 === 1 && (engCalloutState.eng1start || engCalloutState.eng2start)) {
+      engCalloutState = { eng1start:false, eng1alive:false, eng2start:false, eng2alive:false };
+    }
+    _engMst1Last = mst1;
+    _engMst2Last = mst2;
   }
 
   // ── Reset nach Landung ──
@@ -1900,6 +1924,42 @@ function startShortcutRecording() {
 initShortcutDisplay();
 initState();
 render();
+
+// ─── Begrüßung durch Copiloten ───
+function playGreeting() {
+  if (!settings.callouts) return;
+  const simSeconds = lvarValues['A_LOCAL_TIME'];
+  let hour;
+  if (simSeconds !== undefined && simSeconds > 0) {
+    hour = Math.floor(simSeconds / 3600) % 24;
+  } else {
+    hour = new Date().getHours();
+  }
+  let greeting;
+  if (hour >= 5 && hour < 12)       greeting = 'Good morning Captain, welcome aboard';
+  else if (hour >= 12 && hour < 18) greeting = 'Good afternoon Captain, welcome aboard';
+  else if (hour >= 18 && hour < 22) greeting = 'Good evening Captain, welcome aboard';
+  else                               greeting = 'Good night Captain, welcome aboard';
+  calloutSpeak(greeting);
+}
+let _greetingDone = false;
+// Warten bis A_LOCAL_TIME wirklich einen sinnvollen Wert hat
+const _greetingInterval = setInterval(() => {
+  const t = lvarValues['A_LOCAL_TIME'];
+  if (!_greetingDone && t !== undefined && t > 0) {
+    _greetingDone = true;
+    clearInterval(_greetingInterval);
+    setTimeout(playGreeting, 500);
+  }
+}, 500);
+// Fallback nach 10 Sekunden mit PC-Zeit
+setTimeout(() => {
+  if (!_greetingDone) {
+    _greetingDone = true;
+    clearInterval(_greetingInterval);
+    playGreeting();
+  }
+}, 10000);
 // Automatisch verbinden versuchen beim Start
 if (settings.autoConnect) setTimeout(() => {
   connectLVars();
