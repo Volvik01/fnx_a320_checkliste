@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Condor Cabin Manager – Einstellungen</title>
+  <link rel="icon" href="/icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/settings.css">
+</head>
+<body>
+  <!-- Electron Titelleiste -->
+  <div class="titlebar" id="titlebar" style="display:none">
+    <div class="titlebar-left">
+      <div class="titlebar-logo">
+        <img src="/icon.svg" width="18" height="18" alt="Condor" style="border-radius:3px">
+        <span class="titlebar-airline">Condor</span>
+      </div>
+      <span class="titlebar-sub">Einstellungen</span>
+    </div>
+    <div class="titlebar-controls">
+      <button class="titlebar-btn" onclick="window.electronAPI?.minimize()">─</button>
+      <button class="titlebar-btn" onclick="window.electronAPI?.maximize()">□</button>
+      <button class="titlebar-btn close" onclick="window.electronAPI?.close()">✕</button>
+    </div>
+  </div>
+  <header class="topbar">
+    <div class="topbar-left">
+      <a href="/" class="back-btn" onclick="goBack(event)">← Dashboard</a>
+      <div class="logo">
+        <img src="/icon.svg" width="22" height="22" alt="Condor" style="border-radius:4px">
+        <span class="logo-airline">Condor</span>
+        <span class="logo-text">Einstellungen</span>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <span id="save-indicator" class="save-indicator"></span>
+    </div>
+  </header>
+
+  <div class="settings-layout">
+
+    <!-- Sidebar Navigation -->
+    <aside class="settings-nav">
+      <a href="#simbrief"     class="snav-item active" onclick="scrollTo('simbrief')">SimBrief</a>
+      <a href="#announcements" class="snav-item"       onclick="scrollTo('announcements')">Ansagen</a>
+      <a href="#tts"          class="snav-item"        onclick="scrollTo('tts')">Stimme</a>
+      <a href="#boarding"     class="snav-item"        onclick="scrollTo('boarding')">Boarding</a>
+      <a href="#about"        class="snav-item"        onclick="scrollTo('about')">Info</a>
+    </aside>
+
+    <!-- Hauptinhalt -->
+    <main class="settings-main">
+
+      <!-- ── SimBrief ─────────────────────────────────── -->
+      <section class="settings-section" id="simbrief">
+        <h2 class="settings-heading">SimBrief</h2>
+
+        <div class="setting-card">
+          <div class="setting-row">
+            <div class="setting-info">
+              <div class="setting-label">Pilot ID</div>
+              <div class="setting-desc">Deine SimBrief-Piloten-Nummer (Account → Pilot ID)</div>
+            </div>
+            <input type="text" id="simbrief-id" class="setting-input" placeholder="z.B. 242054" maxlength="10">
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <div class="setting-label">Benutzername (alternativ)</div>
+              <div class="setting-desc">Navigraph-Alias statt Pilot ID verwenden</div>
+            </div>
+            <input type="text" id="simbrief-username" class="setting-input" placeholder="z.B. flyingpilot">
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <div class="setting-label">Auto-Import beim Start</div>
+              <div class="setting-desc">OFP automatisch laden wenn die App startet</div>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" id="simbrief-autoload">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+
+          <div class="setting-actions">
+            <button class="btn btn-secondary" onclick="testSimbrief()">Verbindung testen</button>
+            <div id="simbrief-test-result" class="test-result"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── Ansagesprache ────────────────────────────── -->
+      <section class="settings-section" id="announcements">
+        <h2 class="settings-heading">Ansagesprache</h2>
+
+        <div class="setting-card">
+          <div class="setting-row">
+            <div class="setting-info">
+              <div class="setting-label">Hauptsprache</div>
+              <div class="setting-desc">Sprache der Kabinenansagen</div>
+            </div>
+            <select id="ann-language" class="setting-select" onchange="onLanguageChange()">
+              <option value="de">🇩🇪 Deutsch</option>
+              <option value="en-gb">🇬🇧 English (British)</option>
+              <option value="en-us">🇺🇸 English (American)</option>
+              <option value="fr">🇫🇷 Français</option>
+              <option value="es">🇪🇸 Español</option>
+              <option value="it">🇮🇹 Italiano</option>
+              <option value="nl">🇳🇱 Nederlands</option>
+              <option value="tr">🇹🇷 Türkçe</option>
+            </select>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <div class="setting-label">Zweisprachige Ansagen</div>
+              <div class="setting-desc">Ansagen in Hauptsprache + Englisch (wie bei echten Airlines)</div>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" id="ann-bilingual">
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+
+          <div class="setting-row" id="secondary-lang-row" style="display:none">
+            <div class="setting-info">
+              <div class="setting-label">Zweite Sprache</div>
+              <div class="setting-desc">Wird nach der Hauptsprache gesprochen</div>
+            </div>
+            <select id="ann-language-2" class="setting-select">
+              <option value="en-gb">🇬🇧 English (British)</option>
+              <option value="en-us">🇺🇸 English (American)</option>
+              <option value="de">🇩🇪 Deutsch</option>
+            </select>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <div class="setting-label">Airline-Stil</div>
+              <div class="setting-desc">Ton und Formulierung der Ansagen</div>
+            </div>
+            <select id="ann-style" class="setting-select">
+              <option value="standard">Standard (neutral)</option>
+              <option value="lufthansa">Lufthansa-Stil</option>
+              <option value="ryanair">Ryanair-Stil</option>
+              <option value="british">British Airways-Stil</option>
+            </select>
+          </div>
+
+          <!-- Vorschau -->
+          <div class="preview-box">
+            <div class="preview-label">Vorschau Willkommensansage</div>
+            <div id="ann-preview" class="preview-text">—</div>
+            <button class="btn btn-ghost" style="margin-top:8px;font-size:12px" onclick="playPreview()">▶ Anhören</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── TTS / Stimme ─────────────────────────────── -->
+      <section class="settings-section" id="tts">
+        <h2 class="settings-heading">Stimme & Sprachausgabe</h2>
+
+        <div class="setting-card">
+          <div class="setting-row">
+            <div class="setting-info">
+              <div class="setting-label">Windows-Stimme</div>
+              <div class="setting-desc">Automatisch passend zur gewählten Sprache, oder manuell festlegen</div>
+            </div>
+            <select id="tts-voice" class="setting-select">
+              <option value="auto">Automatisch (nach Sprache)</option>
+              <optgroup label="Deutsch">
+                <option value="Microsoft Hedda Desktop">Hedda (DE, weiblich)</option>
+                <option value="Microsoft Stefan Desktop">Stefan (DE, männlich)</option>
+                <option value="Microsoft Katja">Katja (DE, weiblich, Neural)</option>
+                <option value="Microsoft Conrad">Conrad (DE, männlich, Neural)</option>
+              </optgroup>
+              <optgroup label="English">
+                <option value="Microsoft Hazel Desktop">Hazel (EN-GB, weiblich)</option>
+                <option value="Microsoft George Desktop">George (EN-GB, männlich)</option>
+                <option value="Microsoft Zira Desktop">Zira (EN-US, weiblich)</option>
+                <option value="Microsoft David Desktop">David (EN-US, männlich)</option>
+                <option value="Microsoft Aria">Aria (EN-US, Neural)</option>
+                <option value="Microsoft Sonia">Sonia (EN-GB, Neural)</option>
+                <option value="Microsoft Ryan">Ryan (EN-GB, männlich, Neural)</option>
+              </optgroup>
+            </select>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <div class="setting-label">Sprechgeschwindigkeit</div>
+              <div class="setting-desc">Langsamer für bessere Verständlichkeit</div>
+            </div>
+            <div class="slider-wrap">
+              <input type="range" id="tts-rate" min="0.5" max="1.5" step="0.05" value="0.9"
+                     oninput="el('tts-rate-val').textContent = this.value">
+              <span id="tts-rate-val" class="slider-val">0.9</span>
+            </div>
+          </div>
+
+          <div class="setting-actions">
+            <button class="btn btn-secondary" onclick="testTts()">Stimme testen</button>
+            <div id="tts-test-result" class="test-result"></div>
+          </div>
+
+          <div style="padding:14px 18px;font-size:11px;color:var(--text2,#888);border-top:1px solid rgba(255,255,255,0.05)">
+            💡 Bessere Neural-Stimmen (Katja, Conrad, Sonia, Ryan) findest du unter:<br>
+            Windows-Einstellungen → Zeit &amp; Sprache → Sprache → Sprachpaket herunterladen
+          </div>
+        </div>
+      </section>
+
+      <!-- ── Boarding ─────────────────────────────────── -->
+      <section class="settings-section" id="boarding">
+        <h2 class="settings-heading">Boarding</h2>
+
+        <div class="setting-card">
+          <div class="setting-row">
+            <div class="setting-info">
+              <div class="setting-label">Business-Class-Sitze</div>
+              <div class="setting-desc">Anzahl Business-Sitze im Fenix A320 (Standard: 12)</div>
+            </div>
+            <input type="number" id="board-business-seats" class="setting-input-sm" value="12" min="0" max="30">
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <div class="setting-label">Automatische Ansagen</div>
+              <div class="setting-desc">Ansagen automatisch beim Boarding-Fortschritt abspielen</div>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" id="board-auto-ann" checked>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <div class="setting-label">Business-Aufruf bei Boarding-Start</div>
+              <div class="setting-desc">Business Class zuerst einladen</div>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" id="board-business-first" checked>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <div class="setting-label">Ansage bei 50% Boarding</div>
+              <div class="setting-desc">Halbzeit-Ansage automatisch abspielen</div>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" id="board-halfway-ann" checked>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+
+          <div class="setting-row">
+            <div class="setting-info">
+              <div class="setting-label">GSX Pro LVAR-Polling</div>
+              <div class="setting-desc">Intervall in dem GSX-Status abgefragt wird (Sekunden)</div>
+            </div>
+            <div class="slider-wrap">
+              <input type="range" id="board-gsx-interval" min="1" max="10" step="1" value="3"
+                     oninput="el('board-gsx-val').textContent = this.value + 's'">
+              <span id="board-gsx-val" class="slider-val">3s</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── Info ─────────────────────────────────────── -->
+      <section class="settings-section" id="about">
+        <h2 class="settings-heading">Info</h2>
+        <div class="setting-card">
+          <div class="about-grid">
+            <div class="about-row"><span>Version</span><span>1.0.0</span></div>
+            <div class="about-row"><span>SimConnect</span><span>MSFS 2024 SDK</span></div>
+            <div class="about-row"><span>GSX Pro</span><span>FSDT Couatl Engine</span></div>
+            <div class="about-row"><span>Datenbank</span><span>JSON (flightcabin.json)</span></div>
+            <div class="about-row"><span>SimBrief API</span><span>simbrief.com/api</span></div>
+          </div>
+          <div class="setting-actions" style="margin-top:16px">
+            <button class="btn btn-danger-ghost" onclick="resetAll()">Alle Daten zurücksetzen</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Speichern -->
+      <div class="settings-footer">
+        <button class="btn btn-primary" onclick="saveSettings()">Einstellungen speichern</button>
+        <button class="btn btn-ghost" onclick="goBack(event)">Abbrechen</button>
+      </div>
+
+    </main>
+  </div>
+
+  <script src="/js/settings.js"></script>
+  <script>
+    function goBack(e) {
+      e.preventDefault();
+      window.location.href = '/';
+    }
+    // Electron Titelleiste
+    if (window.electronAPI?.isElectron) {
+      const tb = document.getElementById('titlebar');
+      if (tb) tb.style.display = 'flex';
+    }
+  </script>
+</body>
+</html>

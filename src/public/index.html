@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Condor Cabin Manager</title>
+  <link rel="icon" href="/icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+  <div class="titlebar" id="titlebar" style="display:none">
+    <div class="titlebar-left">
+      <div class="titlebar-logo">
+        <img src="/icon.svg" width="16" height="16" alt="Condor" style="border-radius:3px">
+        <span class="titlebar-airline">Condor</span>
+      </div>
+      <span class="titlebar-sub">Cabin Manager</span>
+    </div>
+    <div class="titlebar-controls">
+      <button class="titlebar-btn" onclick="window.electronAPI?.minimize()">─</button>
+      <button class="titlebar-btn" onclick="window.electronAPI?.maximize()">□</button>
+      <button class="titlebar-btn close" onclick="window.electronAPI?.close()">✕</button>
+    </div>
+  </div>
+
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="logo" id="browser-logo">
+        <img src="/icon.svg" width="20" height="20" alt="Condor" style="border-radius:4px">
+        <span class="logo-airline">Condor</span>
+        <span class="logo-text">Cabin Manager</span>
+      </div>
+      <div class="flight-badge" id="flight-badge">Kein Flug</div>
+    </div>
+    <div class="topbar-right">
+      <a href="/settings.html" class="settings-link">⚙ Einstellungen</a>
+      <div class="status-indicator">
+        <span class="dot" id="sim-dot"></span>
+        <span id="sim-label">SimConnect</span>
+      </div>
+      <div class="status-indicator">
+        <span class="dot" id="gsx-dot"></span>
+        <span>GSX Pro</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="layout">
+
+    <!-- Linke Sidebar -->
+    <aside class="sidebar">
+
+      <div class="sidebar-section">
+        <div class="section-header">SimBrief</div>
+        <button class="btn btn-primary" onclick="importSimbrief()" id="simbrief-btn" style="width:100%;font-size:11px;padding:6px">
+          ⬇ OFP importieren
+        </button>
+        <div id="simbrief-info" class="simbrief-info" style="display:none"></div>
+      </div>
+
+      <div class="sidebar-section">
+        <div class="section-header">MSFS Live</div>
+        <div class="sim-data">
+          <div class="sim-row"><span>Status</span><span id="sim-ground">—</span></div>
+          <div class="sim-row"><span>Speed</span><span id="sim-speed">—</span></div>
+          <div class="sim-row"><span>Altitude</span><span id="sim-alt">—</span></div>
+          <div class="sim-row"><span>Brake</span><span id="sim-brake">—</span></div>
+        </div>
+        <div class="phase-badge-wrap">
+          <span class="phase-label">Phase</span>
+          <span class="phase-badge" id="phase-badge">PREFLIGHT</span>
+        </div>
+        <div class="phase-badge-wrap">
+          <span class="phase-label">CAB Vol</span>
+          <span class="phase-label" id="cab-volume-pct" style="color:var(--sky);font-family:var(--font-mono)">—</span>
+        </div>
+        <div class="progress-bar-wrap" style="height:3px;margin:3px 0 6px">
+          <div class="progress-bar" id="cab-volume-bar" style="width:100%"></div>
+        </div>
+        <div class="auto-ann-toggle">
+          <span>Auto-Ansagen</span>
+          <label class="toggle-sm">
+            <input type="checkbox" id="auto-ann-toggle" checked onchange="toggleAutoAnn(this.checked)">
+            <span class="toggle-sm-slider"></span>
+          </label>
+        </div>
+        <button class="btn btn-secondary" onclick="connectSim()" id="connect-btn"
+                style="width:100%;margin-top:5px;font-size:10px;padding:5px">
+          Mit MSFS verbinden
+        </button>
+      </div>
+
+      <div class="sidebar-section" style="flex:1;min-height:0">
+        <div class="section-header">
+          Passagiere
+          <input type="text" id="pax-search" placeholder="Suchen..."
+                 oninput="filterPassengers(this.value)"
+                 style="margin-left:auto;width:80px;background:var(--bg3);border:1px solid var(--border);border-radius:4px;color:var(--text);padding:2px 5px;font-size:10px">
+        </div>
+        <div id="passengers-list" class="passengers-list">
+          <div class="empty-state">Flug wählen</div>
+        </div>
+      </div>
+
+    </aside>
+
+    <!-- Hauptbereich -->
+    <main class="main-content">
+
+      <!-- Boarding + Ansagen in einer Karte -->
+      <section class="card">
+
+        <!-- Boarding Header -->
+        <div class="card-header" style="margin-bottom:8px">
+          <h2>Boarding</h2>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="gsx-hint" id="gsx-hint" style="margin:0">GSX startet automatisch</span>
+            <div class="boarding-state-badge" id="boarding-badge">IDLE</div>
+          </div>
+        </div>
+
+        <!-- Kompakte Stats-Leiste -->
+        <div class="stats-bar">
+          <div class="stat-item">
+            <span class="stat-num" id="stat-total">0</span>
+            <span class="stat-lbl">Pax</span>
+          </div>
+          <div class="stat-div"></div>
+          <div class="stat-item">
+            <span class="stat-num" id="stat-boarded">0</span>
+            <span class="stat-lbl">Geboardet</span>
+          </div>
+          <div class="stat-div"></div>
+          <div class="stat-item">
+            <span class="stat-num" id="stat-remaining">0</span>
+            <span class="stat-lbl">Ausstehend</span>
+          </div>
+          <div class="stat-div"></div>
+          <div class="stat-item">
+            <span class="stat-num" id="stat-progress">0%</span>
+            <span class="stat-lbl">Fortschritt</span>
+          </div>
+          <div style="flex:1"></div>
+          <button class="btn btn-primary" id="start-boarding-btn" onclick="startBoarding()" style="font-size:11px;padding:5px 12px">Manuell</button>
+          <button class="btn btn-danger"  id="stop-boarding-btn" onclick="stopBoarding()" disabled style="font-size:11px;padding:5px 12px">Stop</button>
+        </div>
+
+        <div class="progress-bar-wrap" style="margin:6px 0 10px">
+          <div class="progress-bar" id="boarding-progress" style="width:0%"></div>
+        </div>
+
+        <!-- Trennlinie -->
+        <div style="border-top:1px solid var(--border);margin-bottom:8px"></div>
+
+        <!-- Ansagen kompakt -->
+        <div class="ann-group-label">Boarding</div>
+        <div class="ann-grid-5" style="margin-bottom:5px">
+          <button class="ann-btn" onclick="playAnnouncement('WELCOME')">🎙 Willkommen</button>
+          <button class="ann-btn" onclick="playAnnouncement('BOARDING_START')">🚶 Start</button>
+          <button class="ann-btn" onclick="playAnnouncement('BOARDING_BUSINESS')">💼 Business</button>
+          <button class="ann-btn" onclick="playAnnouncement('BOARDING_ECONOMY')">🪑 Economy</button>
+          <button class="ann-btn" onclick="playAnnouncement('BOARDING_COMPLETE')">✅ Abschluss</button>
+        </div>
+
+        <div class="ann-group-label">Flug</div>
+        <div class="ann-grid-5" style="margin-bottom:5px">
+          <button class="ann-btn" onclick="playAnnouncement('SAFETY_DEMO')">🦺 Safety</button>
+          <button class="ann-btn" onclick="playAnnouncement('DOORS_CLOSING')">🚪 Türen</button>
+          <button class="ann-btn" onclick="playAnnouncement('TAXI')">🛫 Taxi</button>
+          <button class="ann-btn" onclick="playAnnouncement('TAKEOFF_PREP')">✈️ Start</button>
+          <button class="ann-btn" onclick="playAnnouncement('CRUISE')">☁️ Reiseflug</button>
+        </div>
+
+        <div class="ann-grid-5" style="margin-bottom:8px">
+          <button class="ann-btn" onclick="playAnnouncement('DESCENT')">📉 Sinkflug</button>
+          <button class="ann-btn" onclick="playAnnouncement('LANDING')">🛬 Landung</button>
+          <button class="ann-btn" onclick="playAnnouncement('AFTER_LANDING')">🏁 Nach Ldg.</button>
+          <button class="ann-btn ann-danger"  onclick="playAnnouncement('TURBULENCE')">⚡ Turbulenz</button>
+          <button class="ann-btn ann-warning" onclick="playAnnouncement('DELAY')">⏰ Verspätung</button>
+        </div>
+
+        <!-- Eigene Ansage einzeilig -->
+        <div style="display:flex;gap:6px">
+          <input type="text" id="custom-text" placeholder="Eigene Ansage..."
+                 style="flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);padding:6px 10px;font-size:12px;font-family:var(--font-main)">
+          <button class="btn btn-secondary" onclick="playCustom()" style="font-size:11px;padding:6px 10px;white-space:nowrap">🎙 Abspielen</button>
+          <button class="btn btn-ghost"     onclick="stopAnnouncement()" style="font-size:11px;padding:6px 8px">⏹</button>
+        </div>
+
+      </section>
+
+    </main>
+
+    <!-- Sitzplan -->
+    <aside class="seatmap-sidebar">
+      <div class="section-header">Sitzplan A320</div>
+      <div id="seatmap" class="seatmap"><div class="loading">Lade...</div></div>
+      <div class="seatmap-legend">
+        <span class="legend-item"><span class="seat-dot business"></span> Business</span>
+        <span class="legend-item"><span class="seat-dot free"></span> Frei</span>
+        <span class="legend-item"><span class="seat-dot boarded"></span> Geboardet</span>
+      </div>
+    </aside>
+  </div>
+
+  <!-- Modal: Neuer Flug -->
+  <div class="modal-overlay" id="new-flight-modal" onclick="closeModal(event)">
+    <div class="modal">
+      <h3>Neuer Flug</h3>
+      <div class="form-row"><label>Flugnummer</label><input type="text" id="f-nr" placeholder="DE001" maxlength="10"></div>
+      <div class="form-row"><label>Abflug (ICAO)</label><input type="text" id="f-origin" placeholder="EDDF" maxlength="4"></div>
+      <div class="form-row"><label>Ziel (ICAO)</label><input type="text" id="f-dest" placeholder="LEPA" maxlength="4"></div>
+      <div class="form-row"><label>Datum</label><input type="date" id="f-date"></div>
+      <div class="form-actions">
+        <button class="btn btn-primary" onclick="createFlight()">Erstellen</button>
+        <button class="btn btn-ghost" onclick="document.getElementById('new-flight-modal').classList.remove('active')">Abbrechen</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/app.js"></script>
+  <script>
+    if (window.electronAPI?.isElectron) {
+      document.getElementById('titlebar').style.display = 'flex';
+      document.getElementById('browser-logo').style.display = 'none';
+    }
+  </script>
+</body>
+</html>

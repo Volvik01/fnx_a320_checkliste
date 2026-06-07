@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>Boarding — A320</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background: #080e18;
+    color: #c8d6e5;
+    font-family: 'Consolas', monospace;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    user-select: none;
+  }
+
+  #titlebar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 3px 12px;
+    background: #0d1117;
+    border-bottom: 1px solid #1e2e3e;
+    -webkit-app-region: drag;
+    flex-shrink: 0;
+  }
+  .tb-left { display:flex; align-items:center; gap:10px; }
+  .tb-title { font-size:9px; letter-spacing:2px; color:#00b4d8; font-weight:700; }
+  .tb-sub { font-size:8px; color:#5a6a7e; }
+  #btn-close {
+    -webkit-app-region: no-drag;
+    background:#1a0a0a; border:1px solid #3a1a1a; color:#ef4444;
+    width:20px; height:20px; border-radius:50%; cursor:pointer; font-size:11px;
+    display:flex; align-items:center; justify-content:center;
+  }
+  #btn-close:hover { background:#ef4444; color:#fff; }
+
+  #stats-bar {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 3px 10px;
+    background: #0a1520;
+    border-bottom: 1px solid #1e2e3e;
+    flex-shrink: 0;
+  }
+  .stat { display:flex; flex-direction:column; }
+  .stat-label { font-size:6px; color:#5a6a7e; letter-spacing:1.5px; }
+  .stat-value { font-size:12px; font-weight:700; }
+  .green { color:#22c55e; }
+  .accent { color:#00b4d8; }
+  #prog-wrap { flex:1; display:flex; flex-direction:column; gap:2px; }
+  #prog-outer { background:#0d1f2d; border-radius:3px; height:4px; overflow:hidden; border:1px solid #1e2e3e; }
+  #prog-inner { height:100%; width:0%; background:linear-gradient(90deg,#0077a8,#00b4d8,#22c55e); border-radius:3px; transition:width 1.5s ease; }
+  #status-text { font-size:7px; color:#5a6a7e; letter-spacing:1px; }
+
+  /* ── Cabin View ── */
+  #cabin-outer {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    padding: 1px 8px 1px;
+    gap: 4px;
+    overflow: hidden;
+    min-height: 0;
+  }
+
+  /* Nase / Heck Symbole */
+  .cap { font-size:18px; color:#1e3a5f; flex-shrink:0; line-height:1; }
+
+  /* Flugzeugrumpf */
+  #fuselage {
+    flex: 1;
+    border-top: 2px solid #1e3a5f;
+    border-bottom: 2px solid #1e3a5f;
+    display: flex;
+    flex-direction: column;
+    padding: 2px 2px;
+    gap: 0;
+    height: 100%;
+    min-height: 0;
+  }
+
+  /* Sitzblock (A+B+C oder D+E+F) */
+  .seat-block {
+    display: flex;
+    flex: 1;
+    gap: 2px;
+    min-height: 0;
+    overflow: hidden;
+    align-items: center;
+  }
+
+  /* Gang */
+  .aisle {
+    height: 3px;
+    display: flex;
+    align-items: center;
+    padding: 0 2px;
+    flex-shrink: 0;
+  }
+  .aisle-line {
+    flex: 1;
+    height: 1px;
+    background: repeating-linear-gradient(90deg, #1e2e3e 0px, #1e2e3e 4px, transparent 4px, transparent 8px);
+  }
+
+  /* Sitz-Spalte (eine Reihe = eine Spalte) */
+  .seat-col {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex-shrink: 0;
+    width: 15px;
+  }
+
+  /* Einzelner Sitz — quadratisch */
+  .seat {
+    width: 15px;
+    height: 15px;
+    flex-shrink: 0;
+    border-radius: 2px;
+    background: #1a2535;
+    border: 1px solid #1e2e3e;
+    transition: background 0.5s ease, border-color 0.3s ease;
+  }
+  .seat.occupied { background:#166534; border-color:#22c55e; }
+  .seat.exit { border-color:#0077a8; }
+  .seat.exit.occupied { background:#166534; border-color:#22c55e; }
+
+  /* Reihen-Nummern unter dem Rumpf */
+  #row-nums { display: none; }
+
+  /* Legend */
+  #legend { display: none; }
+</style>
+</head>
+<body>
+
+<div id="titlebar">
+  <div class="tb-left">
+    <span class="tb-title">✈ BOARDING</span>
+    <span class="tb-sub">AIRBUS A320 · 180 PAX</span>
+  </div>
+  <button id="btn-close" onclick="window.close()">×</button>
+</div>
+
+<div id="stats-bar">
+  <div class="stat">
+    <span class="stat-label">EINGESTIEGEN</span>
+    <span class="stat-value green" id="s-boarded">0</span>
+  </div>
+  <div class="stat">
+    <span class="stat-label">GESAMT</span>
+    <span class="stat-value accent" id="s-total">180</span>
+  </div>
+  <div class="stat">
+    <span class="stat-label">AUSSTEHEND</span>
+    <span class="stat-value" id="s-remaining">180</span>
+  </div>
+  <div id="prog-wrap">
+    <div id="prog-outer"><div id="prog-inner"></div></div>
+    <div id="status-text">WARTE AUF BOARDING...</div>
+  </div>
+  <div class="stat">
+    <span class="stat-label">FORTSCHRITT</span>
+    <span class="stat-value" id="s-pct">0%</span>
+  </div>
+</div>
+
+<div id="cabin-outer">
+  <div class="cap">◁</div>
+  <div id="fuselage">
+    <div class="seat-block" id="block-top"></div>
+    <div class="aisle"><div class="aisle-line"></div></div>
+    <div class="seat-block" id="block-bot"></div>
+  </div>
+  <div class="cap">▷</div>
+</div>
+
+<div id="row-nums">
+  <div class="cap-spacer"></div>
+  <div id="row-nums-inner"></div>
+  <div class="cap-spacer"></div>
+</div>
+
+<div id="legend">
+  <div class="leg">
+    <div class="leg-box" style="background:#1a2535;border:1px solid #1e2e3e;"></div>FREI
+  </div>
+  <div class="leg">
+    <div class="leg-box" style="background:#166534;border:1px solid #22c55e;"></div>BESETZT
+  </div>
+  <div class="leg">
+    <div class="leg-box" style="background:#1a2535;border:1px solid #0077a8;"></div>EXIT (11/12)
+  </div>
+</div>
+
+<script>
+const { ipcRenderer } = require('electron');
+const ROWS = 30;
+const EXIT_ROWS = [11, 12];
+let seats = Array(ROWS * 6).fill(false);
+let boardOrder = [];
+let totalPax = 180;
+
+function shuffle(arr) {
+  for (let i = arr.length-1; i>0; i--) {
+    const j = Math.floor(Math.random()*(i+1));
+    [arr[i],arr[j]]=[arr[j],arr[i]];
+  }
+  return arr;
+}
+
+function generateBoardOrder(total) {
+  return shuffle([...Array(ROWS*6).keys()]).slice(0, total);
+}
+
+function buildCabin() {
+  const top = document.getElementById('block-top');
+  const bot = document.getElementById('block-bot');
+  const nums = document.getElementById('row-nums-inner');
+  top.innerHTML = ''; bot.innerHTML = ''; nums.innerHTML = '';
+  seats = Array(ROWS*6).fill(false);
+
+  for (let r=0; r<ROWS; r++) {
+    const isExit = EXIT_ROWS.includes(r+1);
+    const ec = isExit ? ' exit' : '';
+
+    // Top block: cols 0,1,2 (A,B,C)
+    const colTop = document.createElement('div');
+    colTop.className = 'seat-col';
+    for (let c=0; c<3; c++) {
+      const s = document.createElement('div');
+      s.className = 'seat'+ec;
+      s.id = `seat-${r*6+c}`;
+      colTop.appendChild(s);
+    }
+    top.appendChild(colTop);
+
+    // Bot block: cols 3,4,5 (D,E,F)
+    const colBot = document.createElement('div');
+    colBot.className = 'seat-col';
+    for (let c=3; c<6; c++) {
+      const s = document.createElement('div');
+      s.className = 'seat'+ec;
+      s.id = `seat-${r*6+c}`;
+      colBot.appendChild(s);
+    }
+    bot.appendChild(colBot);
+
+    // Row number (every 5)
+    const n = document.createElement('div');
+    n.className = 'row-num';
+    n.textContent = (r+1) % 5 === 0 ? r+1 : '';
+    nums.appendChild(n);
+  }
+}
+
+function updateSeats(boarded, total) {
+  if (total>0 && total!==totalPax) {
+    totalPax = total;
+    boardOrder = generateBoardOrder(totalPax);
+  }
+  const toFill = Math.min(boarded, boardOrder.length);
+  for (let i=0; i<toFill; i++) {
+    const idx = boardOrder[i];
+    if (!seats[idx]) {
+      seats[idx] = true;
+      const el = document.getElementById(`seat-${idx}`);
+      if (el) el.classList.add('occupied');
+    }
+  }
+  const pct = total>0 ? Math.round((boarded/total)*100) : 0;
+  document.getElementById('s-boarded').textContent   = boarded;
+  document.getElementById('s-total').textContent     = total||180;
+  document.getElementById('s-remaining').textContent = Math.max(0,(total||180)-boarded);
+  document.getElementById('s-pct').textContent       = pct+'%';
+  document.getElementById('prog-inner').style.width  = pct+'%';
+  const st = document.getElementById('status-text');
+  if (boarded===0)                   st.textContent = 'WARTE AUF BOARDING...';
+  else if (boarded>=total&&total>0)  st.textContent = '✓ BOARDING ABGESCHLOSSEN';
+  else                               st.textContent = `BOARDING LÄUFT · ${total-boarded} PAX AUSSTEHEND`;
+}
+
+ipcRenderer.on('boarding-update', (e, {boarded, total}) => updateSeats(boarded, total));
+
+buildCabin();
+boardOrder = generateBoardOrder(180);
+ipcRenderer.send('boarding-get-state');
+</script>
+</body>
+</html>

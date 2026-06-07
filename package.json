@@ -2,14 +2,53 @@
   "name": "fenix-a320-checklist",
   "version": "1.0.0",
   "description": "Fenix A320 Checkliste - Overlay App für MSFS 2024",
+  "author": "Daniel Huber",
   "main": "src/main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "build": "electron-builder --win --x64"
+  },
+  "build": {
+    "appId": "com.fenix.a320checklist",
+    "productName": "Fenix A320 Checkliste",
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "assets/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "installerLanguages": [
+        "de_DE"
+      ],
+      "language": "1031"
+    },
+    "files": [
+      "src/**/*",
+      "bridge/**/*",
+      "assets/**/*",
+      "node_modules/**/*"
+    ],
+    "asarUnpack": [
+      "bridge/**/*",
+      "node_modules/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "audio",
+        "to": "audio"
+      }
+    ]
   },
   "devDependencies": {
-    "electron": "^28.0.0"
+    "electron": "^28.0.0",
+    "electron-builder": "^24.13.3"
   },
   "dependencies": {
-    "node-simconnect": "^4.2.0"
+    "node-simconnect": "^4.2.0",
+    "ws": "^8.21.0"
   }
 }

@@ -1,0 +1,35 @@
+<svg viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <!-- Hintergrund -->
+  <rect width="512" height="512" rx="100" fill="#E8330A"/>
+  <!-- Weißer Kreis -->
+  <circle cx="256" cy="200" r="130" fill="white" opacity="0.15"/>
+  <!-- Flugzeug weiß, zentriert, leicht nach oben -->
+  <!-- Rumpf -->
+  <rect x="110" y="232" width="292" height="48" rx="24" fill="white"/>
+  <!-- Nase rechts -->
+  <ellipse cx="402" cy="256" rx="36" ry="24" fill="white"/>
+  <!-- Linkes Heck -->
+  <rect x="98" y="232" width="28" height="48" rx="6" fill="white" opacity="0.7"/>
+  <!-- Hauptflügel oben -->
+  <path d="M185 248 L310 248 L370 158 L335 158 Z" fill="white"/>
+  <!-- Hauptflügel unten -->
+  <path d="M185 264 L310 264 L370 354 L335 354 Z" fill="white"/>
+  <!-- Leitwerk oben -->
+  <path d="M106 232 L106 170 L152 232 Z" fill="white"/>
+  <!-- Leitwerk unten -->
+  <path d="M106 280 L106 342 L152 280 Z" fill="white"/>
+  <!-- Fensterreihe -->
+  <g fill="#E8330A">
+    <circle cx="210" cy="256" r="6"/>
+    <circle cx="240" cy="256" r="6"/>
+    <circle cx="270" cy="256" r="6"/>
+    <circle cx="300" cy="256" r="6"/>
+    <circle cx="330" cy="256" r="6"/>
+    <circle cx="360" cy="256" r="6"/>
+  </g>
+  <!-- Condor Schriftzug -->
+  <text x="256" y="448" text-anchor="middle"
+        font-family="Arial Black, Arial, sans-serif"
+        font-weight="900" font-size="64" fill="white"
+        letter-spacing="6">CONDOR</text>
+</svg>

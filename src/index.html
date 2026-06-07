@@ -458,6 +458,10 @@
     <span id="titlebar-sub">NORMAL CHECKLIST</span>
     <div id="titlebar-btns">
       <button id="btn-settings" title="Einstellungen" onclick="openSettings()">⚙</button>
+      <button id="btn-turbulence" title="Turbulence PA" onclick="playPA('Turbulence')" style="
+        background:transparent;border:1px solid #1e3a5f;color:#c8d6e5;
+        padding:2px 7px;border-radius:4px;font-size:13px;cursor:pointer;
+        margin-right:2px;" title="Turbulence Ansage">⚡</button>
       <button class="tbar-btn" id="btn-collapse" title="Einklappen" onclick="toggleCollapse()">▲</button>
       <button class="tbar-btn" id="btn-close" onclick="window.electronAPI.close()">×</button>
     </div>
@@ -595,11 +599,101 @@
         <div class="setting-group-title">CALLOUTS</div>
         <div class="setting-row">
           <div>
-            <div class="setting-label">Callouts aktivieren</div>
+            <div class="setting-label">Callouts aktivieren (Master)</div>
             <div class="setting-sub">Airbus Callouts via Text-to-Speech</div>
           </div>
           <label class="toggle-switch">
             <input type="checkbox" id="tog-callouts" onchange="saveSettings()">
+            <div class="toggle-slider"></div>
+          </label>
+        </div>
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">Takeoff</div>
+            <div class="setting-sub">One hundred · V1 · Rotate</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="tog-callout-takeoff" onchange="saveSettings()">
+            <div class="toggle-slider"></div>
+          </label>
+        </div>
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">After Takeoff</div>
+            <div class="setting-sub">Positive climb · Gear up</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="tog-callout-afterto" onchange="saveSettings()">
+            <div class="toggle-slider"></div>
+          </label>
+        </div>
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">Flaps</div>
+            <div class="setting-sub">Flaps Up · 1 · 2 · 3 · Full</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="tog-callout-flaps" onchange="saveSettings()">
+            <div class="toggle-slider"></div>
+          </label>
+        </div>
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">Approach Altimeter</div>
+            <div class="setting-sub">1000 · 500 · 400 · … · 10 ft</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="tog-callout-approach" onchange="saveSettings()">
+            <div class="toggle-slider"></div>
+          </label>
+        </div>
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">APU Available</div>
+            <div class="setting-sub">"APU available"</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="tog-callout-apu-alive" onchange="saveSettings()">
+            <div class="toggle-slider"></div>
+          </label>
+        </div>
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">Engine Start</div>
+            <div class="setting-sub">"Engine 1/2 start"</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="tog-callout-eng-start" onchange="saveSettings()">
+            <div class="toggle-slider"></div>
+          </label>
+        </div>
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">Engine 1 Alive</div>
+            <div class="setting-sub">"Engine 1 alive"</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="tog-callout-eng1-alive" onchange="saveSettings()">
+            <div class="toggle-slider"></div>
+          </label>
+        </div>
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">Engine 2 Alive</div>
+            <div class="setting-sub">"Engine 2 alive"</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="tog-callout-eng2-alive" onchange="saveSettings()">
+            <div class="toggle-slider"></div>
+          </label>
+        </div>
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">Begrüßung</div>
+            <div class="setting-sub">"Good morning/afternoon Captain"</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="tog-callout-greeting" onchange="saveSettings()">
             <div class="toggle-slider"></div>
           </label>
         </div>
@@ -644,15 +738,81 @@
             <div class="setting-label">Lautstärke</div>
             <div class="setting-sub" id="callout-vol-label">100%</div>
           </div>
-          <input type="range" id="inp-volume" min="0" max="200" value="100" step="10"
+          <input type="range" id="inp-volume" min="0" max="400" value="100" step="10"
             oninput="document.getElementById('callout-vol-label').textContent=this.value+'%'"
+            onchange="saveSettings()"
+            style="width:100px;accent-color:var(--accent);cursor:pointer;">
+        </div>
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">Sprechtempo</div>
+            <div class="setting-sub" id="callout-rate-label">0.92</div>
+          </div>
+          <input type="range" id="inp-rate" min="0.5" max="2.0" value="0.92" step="0.05"
+            oninput="document.getElementById('callout-rate-label').textContent=parseFloat(this.value).toFixed(2)"
+            onchange="saveSettings()"
+            style="width:100px;accent-color:var(--accent);cursor:pointer;">
+        </div>
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">Tonhöhe</div>
+            <div class="setting-sub" id="callout-pitch-label">1.0</div>
+          </div>
+          <input type="range" id="inp-pitch" min="0.5" max="2.0" value="1.0" step="0.05"
+            oninput="document.getElementById('callout-pitch-label').textContent=parseFloat(this.value).toFixed(2)"
             onchange="saveSettings()"
             style="width:100px;accent-color:var(--accent);cursor:pointer;">
         </div>
       </div>
 
       <div class="setting-group">
+        <div class="setting-group-title">CABIN ANNOUNCEMENT</div>
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">Airline Set</div>
+            <div class="setting-sub">PA Audio-Paket auswählen</div>
+          </div>
+          <select id="sel-pa-airline" onchange="saveSettings()" style="
+            background:#0a1929;border:1px solid #1e3a5f;color:#c8d6e5;
+            padding:5px 8px;border-radius:5px;font-size:11px;cursor:pointer;">
+            <option value="condor">Condor</option>
+            <option value="lufthansa">Lufthansa</option>
+          </select>
+        </div>
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">PA Auto-Trigger</div>
+            <div class="setting-sub">Ansagen automatisch abspielen</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="tog-pa-auto" onchange="saveSettings()">
+            <div class="toggle-slider"></div>
+          </label>
+        </div>
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">PA Lautstärke</div>
+            <div class="setting-sub" id="pa-vol-label">100%</div>
+          </div>
+          <input type="range" id="inp-pa-volume" min="0" max="200" value="100" step="10"
+            oninput="document.getElementById('pa-vol-label').textContent=this.value+'%'; saveSettings()"
+            style="width:80px;accent-color:var(--accent);">
+        </div>
+      </div>
+
+      <div class="setting-group">
         <div class="setting-group-title">RESET</div>
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">Developer Tools</div>
+            <div class="setting-sub">Browser DevTools öffnen / schließen</div>
+          </div>
+          <button onclick="window.electronAPI?.toggleDevTools()" style="
+            background:#0a1929;border:1px solid #1e3a5f;color:#c8d6e5;
+            padding:5px 12px;border-radius:5px;font-size:10px;cursor:pointer;">
+            DEV TOOLS
+          </button>
+        </div>
         <div class="setting-row">
           <div>
             <div class="setting-label">Gesamte Checkliste zurücksetzen</div>
@@ -714,7 +874,7 @@ const CHECKLISTS = [
       items: [
         { id:'atis',      action:'ATIS',                    value:'ByondATC',        lvar:null },
         { id:'bat12',     action:'Battery 1 & 2',           value:'ON',              lvar:'S_OH_ELEC_BAT2', lval:1 },
-        { id:'extpwr',    action:'External Power',          value:'AS REQ / ON',     lvar:'I_OH_ELEC_EXT_PWR_U', lval:0 },
+        { id:'extpwr',    action:'External Power',          value:'AS REQ / ON',     lvar:'I_OH_ELEC_EXT_PWR_U', lval:0, noAutoUncheck: true },
         { id:'nav-logo',  action:'Nav & Logo Lights',       value:'ON',              lvar:'A_LT_NAV', lval:1 },
         { id:'no-smk',    action:'No Smoking',              value:'AUTO',            lvar:'S_OH_SIGNS_SMOKING', lval:1 },
         { id:'emer-lt',   action:'Emergency Exit Lights',   value:'ARM',             lvar:'S_OH_INT_LT_EMER', lval:1 },
@@ -735,6 +895,7 @@ const CHECKLISTS = [
     id: 'mcdu-pushback', label: 'MCDU', name: 'MCDU SETUP & PUSHBACK',
     sections: [{
       title: 'SETUP & PUSHBACK',
+      paBoarding: true,
       items: [
         { id:'atc-clear', action:'ATC Clearance IFR',       value:'ByondATC',        lvar:null },
         { id:'gsx-open',  action:'Ingamepanel GSX',         value:'ÖFFNEN',          lvar:null },
@@ -774,7 +935,7 @@ const CHECKLISTS = [
     sections: [{
       title: 'START SEQUENCE',
       items: [
-        { id:'park-brk',  action:'PARKING BRAKE',           value:'SET',             lvar:'A_PARK_BRAKE', lval:1 },
+        { id:'park-brk',  action:'PARKING BRAKE',           value:'SET',             lvar:'A_PARK_BRAKE', lval:1, noAutoUncheck: true },
         { id:'apu-bleed2',action:'APU Bleed',               value:'VERIFY ON',       lvar:'S_OH_PNEUMATIC_APU_BLEED', lval:1 },
         { id:'eng-mode',  action:'ENG Mode Selector',       value:'IGN/START',       lvar:'S_ENG_MODE', lval:2 },
 		    //My old: { id:'eng2-mst',  action:'ENG 2 Master Switch',     value:'ON'     lvar:null },
@@ -839,6 +1000,7 @@ const CHECKLISTS = [
         { id:'strobe',    action:'Strobe Lights',           value:'ON',              lvar:'A_LT_STROBE', lval:1 },
         { id:'tcas-on',   action:'TCAS',                    value:'TA/RA',           lvar:'S_XPDR_MODE', lval:2 },
         { id:'packs-req', action:'Pack 1 & 2',              value:'AS REQ',          lvar:null },
+        { id:'packs-off',  action:'PACK 1 & 2',              value:'OFF',              lvar:'I_OH_PNEUMATIC_PACK_2_L', lval:1 },
         { id:'anti-ice3', action:'ENG & Wing Anti-Ice',     value:'AS REQ',          lvar:null },
       ]
     }]
@@ -861,8 +1023,8 @@ const CHECKLISTS = [
         { id:'gear-up',   action:'Landing Gear',            value:'VERIFY UP',       lvar:'S_MIP_GEAR', lval:0 },
         { id:'flap-ret',  action:'Flaps',                   value:'VERIFY RETRACTED',lvar:'S_FC_FLAPS', lval:0 },
         //{ id:'spd-disarm',action:'Ground Spoilers',         value:'DISARM',          lvar:'A_FC_SPEEDBRAKE', lval:0 },
-        { id:'spoilers',  action:'Ground Spoilers',         value:'ARM',             lvar:'A_FC_SPEEDBRAKE', lval:1 },
-        { id:'packs-on',  action:'PACK 1 & 2',              value:'ON',              lvar:'S_OH_PNEUMATIC_PACK_1', lval:1 },
+        { id:'spoilers',  action:'Ground Spoilers',         value:'DISARM',          lvar:'A_FC_SPEEDBRAKE', lval:1 },
+        { id:'packs-on',  action:'PACK 1 & 2',              value:'ON',              lvar:'I_OH_PNEUMATIC_PACK_2_L', lval:0 },
       ]
     }, {
       title: 'ABOVE FL100',
@@ -883,11 +1045,11 @@ const CHECKLISTS = [
         { id:'nose-on2',  action:'Nose Light',              value:'ON',              lvar:'S_OH_EXT_LT_NOSE', lval:2 },
         { id:'pax-signs2',action:'Passenger Signs',         value:'AS REQ',          lvar:'A_SEATBELTS', lval:1 },
         //{ id:'spd-arm2',  action:'Ground Spoilers',         value:'ARM',             lvar:'A_SPOILERS_ARM', lval:1 },
-        { id:'spoilers_', action:'Ground Spoilers',         value:'DISARM',          lvar:'A_FC_SPEEDBRAKE', lval:1, noAutoOnStart: true },
+        { id:'spoilers_', action:'Ground Spoilers',         value:'ARM',             lvar:'A_FC_SPEEDBRAKE', lval:0, noAutoOnStart: true },
         { id:'autobrk2',  action:'AUTO BRK',                value:'SET MED',         lvar:'I_MIP_AUTOBRAKE_MED_L', lval:1 },
         { id:'ecam-ldg',  action:'ECAM MEMO',               value:'LDG NO BLUE',     lvar:null },
       ]
-    }]
+    }]//AUTOBRAKE
   },
   {
     id: 'landing', label: 'LANDING', name: 'LANDING',
@@ -895,9 +1057,16 @@ const CHECKLISTS = [
       title: 'LANDING CHECKS',
       vrefCalculator: true,
       items: [
-        { id:'gear-dn',   action:'Landing Gear',            value:'VERIFY DOWN',     lvar:'S_MIP_GEAR', lval:1 },
-        { id:'flap-full', action:'Flaps',                   value:'VERIFY FULL',     lvar:'S_FC_FLAPS', lval:4 },
-        { id:'ldg-lt2',   action:'Landing Lights',          value:'ON',              lvar:'A_LT_LANDING', lval:1 },
+        //{ id:'app_arm',  action:'app Arm',                 value:'ARM',                lvar:'I_FCU_APPR', lval:1 },
+        { id:'ls_arm',    action:'LS Arm',                  value:'ARM',               lvar:'S_FCU_EFIS1_LS', lval:2 },
+        { id:'loc_arm',   action:'LOC Arm',                 value:'ARM',               lvar:'S_FCU_LOC', lval:2 },
+        { id:'appr_arm',  action:'APPR Arm',                value:'ARM',               lvar:'S_FCU_APPR', lval:2 },
+        //{ id:'ls_arm',      action:'LS Arm',                  value:'ARM',             lvar:'S_FCU_EFIS1_LS',   lgt:0 },
+        //{ id:'loc_arm',     action:'LOC Arm',                 value:'ARM',             lvar:'S_FCU_EFIS1_LOC',  lgt:0 },
+        //{ id:'appr_arm',    action:'APPR Arm',                value:'ARM',             lvar:'S_FCU_EFIS1_APPR', lgt:0 },
+        { id:'gear-dn',     action:'Landing Gear',            value:'VERIFY DOWN',     lvar:'S_MIP_GEAR', lval:1 },
+        { id:'flap-full',   action:'Flaps',                   value:'VERIFY FULL',     lvar:'S_FC_FLAPS', lval:4 },
+        { id:'ldg-lt2',     action:'Landing Lights',          value:'ON',              lvar:'A_LT_LANDING', lval:1 },
       ]
     }]
   },
@@ -906,7 +1075,7 @@ const CHECKLISTS = [
     sections: [{
       title: 'AFTER LANDING',
       items: [
-        { id:'spd-dis2',  action:'Ground Spoilers',         value:'DISARM',          llvar:'A_FC_SPEEDBRAKE', lval:1 },
+        { id:'spd-dis2',  action:'Ground Spoilers',         value:'DISARM',          lvar:'A_FC_SPEEDBRAKE', lval:1, noAutoOnStart: true },
         { id:'flap-ret2', action:'Flaps',                   value:'RETRACT',         lvar:'S_FC_FLAPS', lval:0 },
         { id:'nose-off2', action:'Nose Light',              value:'OFF',             lvar:'S_OH_EXT_LT_NOSE', lval:0 },
         { id:'ldg-off2',  action:'Landing Lights',          value:'OFF',             lvar:'A_LT_LANDING', lval:0 },
@@ -925,6 +1094,7 @@ const CHECKLISTS = [
     id: 'parking', label: 'PARKING', name: 'PARKING',
     sections: [{
       title: 'PARKING',
+      paParking: true,
       items: [
         { id:'pk-brk2',   action:'PARK BRK / CHOCKS',       value:'SET',             lvar:'A_PARK_BRAKE', lval:1 },
         //{ id:'eng-off',   action:'ENGINES',                  value:'OFF',             lvar:'A_ENG1_MASTER', lval:0 },
@@ -994,9 +1164,12 @@ function connectLVars() {
           }
           if (data.type === 'lvar_update') {
           lvarValues = { ...lvarValues, ...data.values };
-          checkAutoItems(); // render() nur wenn sich wirklich was ändert
+          checkAutoItems();
           checkAltitudeWarning();
           checkCallouts();
+          updateGsDisplay();
+          checkGsxBoarding();
+          checkPaAutoTrigger();
         }
       } catch(e) { console.error(e); }
     };
@@ -1044,6 +1217,7 @@ function getAllLVars() {
   CHECKLISTS.forEach(ph => ph.sections.forEach(s => s.items.forEach(i => {
     if (i.lvar) names.add(i.lvar);
   })));
+  names.add('A_GROUNDSPEED'); // Taxi GS-Anzeige (SimVar aus bridge.js)
   return [...names];
 }
 
@@ -1087,7 +1261,7 @@ function checkAutoItems() {
           }
         }, 3000);
       }
-    } else if (!matches && prevState === 'auto') {
+    } else if (!matches && prevState === 'auto' && !i.noAutoUncheck) {
       state[i.id] = false;
       updateItemDOM(i.id, false, actual);
       anyChanged = true;
@@ -1246,6 +1420,221 @@ function renderVrefSpeeds(sp) {
   `;
 }
 
+function buildPaBoarding() {
+  const box = document.createElement('div');
+  box.style.cssText = 'margin:8px 0 4px;';
+  box.innerHTML = `
+    <!-- Boarding Map Button + PAX Display -->
+    <div style="display:flex;gap:6px;margin-bottom:6px;">
+      <button onclick="openBoardingPopup()" style="
+        flex:1;background:#0a1929;border:1px solid #00b4d8;color:#00b4d8;
+        padding:6px 10px;border-radius:5px;font-size:10px;cursor:pointer;
+        display:flex;align-items:center;justify-content:center;gap:6px;letter-spacing:1px;">
+        ✈ BOARDING MAP
+      </button>
+      <div id="gsx-pax-display" style="
+        flex:1;display:flex;align-items:center;justify-content:space-between;
+        padding:6px 10px;border-radius:5px;background:#060f1a;border:1px solid #1e2e3e;">
+        <span style="font-size:9px;color:#5a6a7e;letter-spacing:1px;">PAX</span>
+        <span style="font-size:15px;font-weight:bold;color:#c8d6e5;font-family:monospace">---<span style="font-size:10px;color:#5a6a7e"> / ---</span></span>
+      </div>
+    </div>
+
+    <!-- Collapsible PA Panel -->
+    <div style="background:#0d1f2d;border:1px solid #1e2e3e;border-radius:6px;overflow:hidden;">
+
+      <!-- Header Toggle -->
+      <button onclick="togglePaPanel()" id="pa-panel-toggle" style="
+        width:100%;background:transparent;border:none;color:#c8d6e5;
+        padding:8px 12px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span style="font-size:13px;">🔊</span>
+          <span style="font-size:10px;letter-spacing:1.5px;color:#00b4d8;">CABIN ANNOUNCEMENTS</span>
+        </div>
+        <span id="pa-panel-arrow" style="font-size:10px;color:#5a6a7e;transition:transform 0.2s;">▼</span>
+      </button>
+
+      <!-- Panel Content -->
+      <div id="pa-panel-content" style="display:none;padding:0 10px 10px;flex-direction:column;gap:5px;">
+
+        <!-- STOP Button -->
+        <button onclick="stopPA()" style="
+          background:#1a0808;border:1px solid #7f1d1d;color:#ef4444;
+          padding:6px 12px;border-radius:5px;font-size:11px;cursor:pointer;
+          display:flex;align-items:center;gap:8px;width:100%;margin-bottom:2px;">
+          <span style="font-size:13px;">■</span>
+          <span>STOP</span>
+        </button>
+
+        <div style="height:1px;background:#1e2e3e;margin:2px 0;"></div>
+
+        <button onclick="playPA('BoardingMusic')" style="
+          background:#0a1929;border:1px solid #1e3a5f;color:#c8d6e5;
+          padding:6px 12px;border-radius:5px;font-size:11px;cursor:pointer;
+          display:flex;align-items:center;gap:8px;">
+          <span style="color:#00b4d8;">▶</span><span>Boarding Music</span>
+        </button>
+        <button onclick="playPA('BoardingWelcome')" style="
+          background:#0a1929;border:1px solid #1e3a5f;color:#c8d6e5;
+          padding:6px 12px;border-radius:5px;font-size:11px;cursor:pointer;
+          display:flex;align-items:center;gap:8px;">
+          <span style="color:#00b4d8;">▶</span><span>Boarding Welcome</span>
+        </button>
+        <button onclick="playPA('BoardingWelcome[Refueling]')" style="
+          background:#0a1929;border:1px solid #1e3a5f;color:#c8d6e5;
+          padding:6px 12px;border-radius:5px;font-size:11px;cursor:pointer;
+          display:flex;align-items:center;gap:8px;">
+          <span style="color:#00b4d8;">▶</span><span>Boarding Welcome (Refueling)</span>
+        </button>
+        <button onclick="playPA('BoardingComplete')" style="
+          background:#0a1929;border:1px solid #1e3a5f;color:#c8d6e5;
+          padding:6px 12px;border-radius:5px;font-size:11px;cursor:pointer;
+          display:flex;align-items:center;gap:8px;">
+          <span style="color:#00b4d8;">▶</span><span>Boarding Complete</span>
+        </button>
+      </div>
+    </div>
+  `;
+  return box;
+}
+
+let _paPanelOpen = false;
+
+function togglePaPanel() {
+  _paPanelOpen = !_paPanelOpen;
+  const content = document.getElementById('pa-panel-content');
+  const arrow   = document.getElementById('pa-panel-arrow');
+  if (content) content.style.display = _paPanelOpen ? 'flex' : 'none';
+  if (arrow)   arrow.style.transform = _paPanelOpen ? 'rotate(180deg)' : 'rotate(0deg)';
+}
+
+let paAudio = null;
+let _paCurrentSource = null; // AudioContext BufferSource für Stop
+
+function stopPA() {
+  if (paAudio) { paAudio.pause(); paAudio = null; }
+  if (_paCurrentSource) { try { _paCurrentSource.stop(); } catch(e) {} _paCurrentSource = null; }
+}
+
+// GSX Boarding State
+let _gsxBoardingActive  = false;
+let _gsxPrevPax         = 0;
+
+// PA Auto-Trigger State
+let _paState = {
+  armDoors:       false,  // ArmDoors gespielt
+  safety:         false,  // PreSafetyBriefing + SafetyBriefing gespielt
+  cabinDim:       false,  // CabinDimTakeoff gespielt
+  afterTakeoff:   false,  // AfterTakeoff gespielt
+  seatbelts:      false,  // FastenSeatbelts gespielt (FL100 abwärts)
+  crewSeats:      false,  // CrewSeatsLanding gespielt
+  disarmDoors:    false,  // DisarmDoors gespielt
+  afterLanding:   false,  // AfterLanding gespielt
+};
+let _beaconLast         = 0;
+let _gearUpLast         = 0;
+let _engModeLast        = 0;
+let _onGroundLast       = true;
+let _paCurrentPhase     = '';
+
+function playPA(name) {
+  const airline = settings.paAirline || 'CFG';
+  const nodePath = require('path');
+  const fs = require('fs');
+  const { app } = require('electron');
+
+  // Im gepackten Build liegt audio/ in resources/audio/ (extraResources)
+  // Erkennung über den Pfad selbst (app.asar im Pfad = gepackt)
+  const isPackaged = __dirname.includes('app.asar');
+  const audioBase = isPackaged
+    ? nodePath.join(process.resourcesPath, 'audio')
+    : nodePath.join(__dirname, '..', 'audio');
+
+  const absPath = nodePath.join(audioBase, 'PA', airline, name + '.ogg');
+  const logPath = require('os').tmpdir() + '/fenix-bridge.log';
+  require('fs').appendFileSync(logPath, `[PA] Pfad: ${absPath} | existiert: ${require('fs').existsSync(absPath)}\n`);
+
+  if (paAudio) { paAudio.pause(); paAudio = null; }
+  if (_paCurrentSource) { try { _paCurrentSource.stop(); } catch(e) {} _paCurrentSource = null; }
+
+  const ctx = getAudioCtx();
+
+  fs.readFile(absPath, (err, data) => {
+    if (err) { console.warn('[PA] Datei nicht gefunden:', absPath); return; }
+
+    ctx.decodeAudioData(data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength))
+      .then(decoded => {
+        const src = ctx.createBufferSource();
+        src.buffer = decoded;
+
+        // High-pass: entfernt Brummen unter 80Hz
+        const hpf = ctx.createBiquadFilter();
+        hpf.type = 'highpass';
+        hpf.frequency.value = 80;
+        hpf.Q.value = 0.7;
+
+        // Bass Boost: minimal
+        const bass = ctx.createBiquadFilter();
+        bass.type = 'peaking';
+        bass.frequency.value = 250;
+        bass.gain.value = 1;
+        bass.Q.value = 0.8;
+
+        // Low-pass: neutral, volle Höhen
+        const lpf = ctx.createBiquadFilter();
+        lpf.type = 'lowpass';
+        lpf.frequency.value = 8000;
+        lpf.Q.value = 0.7;
+
+        // Presence: aus
+        const presence = ctx.createBiquadFilter();
+        presence.type = 'peaking';
+        presence.frequency.value = 2800;
+        presence.gain.value = 0;
+        presence.Q.value = 1.2;
+
+        // Cabin Reverb: minimal
+        const convolver = ctx.createConvolver();
+        const reverbLen = ctx.sampleRate * 0.3;
+        const reverbBuf = ctx.createBuffer(2, reverbLen, ctx.sampleRate);
+        for (let c = 0; c < 2; c++) {
+          const d = reverbBuf.getChannelData(c);
+          for (let i = 0; i < reverbLen; i++) {
+            d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / reverbLen, 3);
+          }
+        }
+        convolver.buffer = reverbBuf;
+
+        // Dry/Wet Mix: fast trocken
+        const dryGain = ctx.createGain();
+        dryGain.gain.value = 0.92;
+        const wetGain = ctx.createGain();
+        wetGain.gain.value = 0.08;
+
+        // Master Gain — PA Lautstärke aus Einstellungen
+        const masterGain = ctx.createGain();
+        masterGain.gain.value = (settings.paVol ?? 100) / 100;
+
+        src.connect(hpf);
+        hpf.connect(bass);
+        bass.connect(lpf);
+        lpf.connect(presence);
+        presence.connect(dryGain);
+        presence.connect(convolver);
+        convolver.connect(wetGain);
+        dryGain.connect(masterGain);
+        wetGain.connect(masterGain);
+        masterGain.connect(ctx.destination);
+
+        _paCurrentSource = src;
+        src.start(0);
+        src.onended = () => { _paCurrentSource = null; };
+        console.log('[PA] Playing:', name);
+      })
+      .catch(e => console.warn('[PA] Decode Fehler:', e));
+  });
+}
+
 function scrollToNextOpen() {
   const phase = CHECKLISTS[currentPhaseIdx];
   // Erstes Item finden das noch nicht erledigt ist
@@ -1366,6 +1755,25 @@ function renderChecklist() {
   wrap.innerHTML = '';
   const phase = CHECKLISTS[currentPhaseIdx];
 
+  // ── Groundspeed Anzeige im Taxi-Tab ──
+  if (phase.id === 'taxi') {
+    const gs = Math.round(lvarValues["A_GROUNDSPEED"] ?? 0); // m/s → kt
+    const gsDiv = document.createElement('div');
+    gsDiv.id = 'gs-display';
+    gsDiv.style.cssText = `
+      display:flex; align-items:center; justify-content:center; gap:8px;
+      padding:8px 12px; margin-bottom:8px; border-radius:6px;
+      background:#0d1f2d; border:1px solid #1e2e3e; font-family:monospace;
+    `;
+    const color = gs >= 30 ? '#ef4444' : gs >= 25 ? '#eab308' : '#c8d6e5';
+    gsDiv.innerHTML = `
+      <span style="font-size:11px;color:#5a6a7e;letter-spacing:1px;">GROUNDSPEED</span>
+      <span style="font-size:22px;font-weight:bold;color:${color}">${gs}</span>
+      <span style="font-size:11px;color:#5a6a7e;">kt</span>
+    `;
+    wrap.appendChild(gsDiv);
+  }
+
   phase.sections.forEach(sec => {
     const hdr = document.createElement('div');
     hdr.className = 'section-header';
@@ -1375,6 +1783,14 @@ function renderChecklist() {
     // Vref Rechner vor den Items einfügen
     if (sec.vrefCalculator) {
       wrap.appendChild(buildVrefCalculator());
+    }
+
+    if (sec.paBoarding) {
+      wrap.appendChild(buildPaBoarding());
+    }
+
+    if (sec.paParking) {
+      wrap.appendChild(buildPaParking());
     }
 
     sec.items.forEach(item => {
@@ -1478,10 +1894,25 @@ let settings = {
   autoNext: false,
   chrAuto: false,
   callouts: false,
+  // Callout-Gruppen (alle unabhängig vom Master)
+  calloutTakeoff:    true,   // One hundred · V1 · Rotate
+  calloutAfterTO:    true,   // Positive climb · Gear up
+  calloutFlaps:      true,   // Flap 0/1/2/3/Full
+  calloutApproach:   true,   // 1000..10 ft Radioalt
+  calloutApuAlive:   true,   // APU available
+  calloutEngStart:   true,   // Engine 1/2 start
+  calloutEng1Alive:  true,   // Engine 1 alive
+  calloutEng2Alive:  true,   // Engine 2 alive
+  calloutGreeting:   true,   // Good morning/afternoon...
+  paAirline: 'condor',       // PA Airline Set
+  paAuto:    true,           // PA Auto-Trigger
+  paVol:     100,            // PA Lautstärke (0-200%)
   v1: 145,
   vr: 150,
   calloutLang: 'en-US',
   calloutVol: 100,
+  calloutRate: 0.92,
+  calloutPitch: 1.0,
 };
 
 function resetAllChecklists() {
@@ -1515,11 +1946,25 @@ function saveSettings() {
   settings.sound       = document.getElementById('tog-sound').checked;
   settings.autoNext    = document.getElementById('tog-autonext').checked;
   settings.chrAuto      = document.getElementById('tog-chr').checked;
-  settings.callouts     = document.getElementById('tog-callouts').checked;
+  settings.callouts        = document.getElementById('tog-callouts').checked;
+  settings.calloutTakeoff   = document.getElementById('tog-callout-takeoff').checked;
+  settings.calloutAfterTO   = document.getElementById('tog-callout-afterto').checked;
+  settings.calloutFlaps     = document.getElementById('tog-callout-flaps').checked;
+  settings.calloutApproach  = document.getElementById('tog-callout-approach').checked;
+  settings.calloutApuAlive  = document.getElementById('tog-callout-apu-alive').checked;
+  settings.calloutEngStart  = document.getElementById('tog-callout-eng-start').checked;
+  settings.calloutEng1Alive = document.getElementById('tog-callout-eng1-alive').checked;
+  settings.calloutEng2Alive = document.getElementById('tog-callout-eng2-alive').checked;
+  settings.calloutGreeting  = document.getElementById('tog-callout-greeting').checked;
+  settings.paAirline        = document.getElementById('sel-pa-airline').value;
+  settings.paAuto           = document.getElementById('tog-pa-auto').checked;
+  settings.paVol            = parseInt(document.getElementById('inp-pa-volume').value) || 100;
   settings.v1           = parseInt(document.getElementById('inp-v1').value) || 145;
   settings.vr           = parseInt(document.getElementById('inp-vr').value) || 150;
   settings.calloutLang  = document.getElementById('sel-voice').value;
   settings.calloutVol   = parseInt(document.getElementById('inp-volume').value) || 100;
+  settings.calloutRate  = parseFloat(document.getElementById('inp-rate').value) || 0.92;
+  settings.calloutPitch = parseFloat(document.getElementById('inp-pitch').value) || 1.0;
   localStorage.setItem('fenix-settings', JSON.stringify(settings));
   // Bridge sofort informieren
   if (ws && ws.readyState === WebSocket.OPEN) {
@@ -1540,13 +1985,33 @@ function loadSettings() {
   document.getElementById('tog-sound').checked      = settings.sound;
   document.getElementById('tog-autonext').checked   = settings.autoNext;
   document.getElementById('tog-chr').checked        = settings.chrAuto ?? false;
-  document.getElementById('tog-callouts').checked   = settings.callouts ?? false;
+  document.getElementById('tog-callouts').checked          = settings.callouts ?? false;
+  document.getElementById('tog-callout-takeoff').checked    = settings.calloutTakeoff  ?? true;
+  document.getElementById('tog-callout-afterto').checked    = settings.calloutAfterTO  ?? true;
+  document.getElementById('tog-callout-flaps').checked      = settings.calloutFlaps    ?? true;
+  document.getElementById('tog-callout-approach').checked   = settings.calloutApproach ?? true;
+  document.getElementById('tog-callout-apu-alive').checked  = settings.calloutApuAlive ?? true;
+  document.getElementById('tog-callout-eng-start').checked  = settings.calloutEngStart ?? true;
+  document.getElementById('tog-callout-eng1-alive').checked = settings.calloutEng1Alive ?? true;
+  document.getElementById('tog-callout-eng2-alive').checked = settings.calloutEng2Alive ?? true;
+  document.getElementById('tog-callout-greeting').checked   = settings.calloutGreeting ?? true;
+  document.getElementById('sel-pa-airline').value           = settings.paAirline ?? 'condor';
+  document.getElementById('tog-pa-auto').checked            = settings.paAuto ?? true;
+  const paVol = settings.paVol ?? 100;
+  document.getElementById('inp-pa-volume').value            = paVol;
+  document.getElementById('pa-vol-label').textContent       = paVol + '%';
   document.getElementById('inp-v1').value           = settings.v1 ?? 145;
   document.getElementById('inp-vr').value           = settings.vr ?? 150;
   document.getElementById('sel-voice').value        = settings.calloutLang ?? 'en-US';
   const vol = settings.calloutVol ?? 100;
   document.getElementById('inp-volume').value       = vol;
   document.getElementById('callout-vol-label').textContent = vol + '%';
+  const rate = settings.calloutRate ?? 0.92;
+  document.getElementById('inp-rate').value         = rate;
+  document.getElementById('callout-rate-label').textContent = rate.toFixed(2);
+  const pitch = settings.calloutPitch ?? 1.0;
+  document.getElementById('inp-pitch').value        = pitch;
+  document.getElementById('callout-pitch-label').textContent = pitch.toFixed(2);
 }
 
 // ─── Audio Engine ───
@@ -1613,6 +2078,22 @@ let calloutState = {
 
 let _calloutSpeaking = false;
 const _calloutQueue   = [];
+let _calloutGainNode  = null;
+let _calloutMediaDest = null;
+
+function getCalloutGain() {
+  if (_calloutGainNode) return _calloutGainNode;
+  const ctx  = getAudioCtx();
+  _calloutMediaDest = ctx.createMediaStreamDestination();
+  _calloutGainNode  = ctx.createGain();
+  _calloutGainNode.connect(_calloutMediaDest);
+  // Stummes Audio-Element das den verstärkten Stream abspielt
+  const boostAudio = new window.Audio();
+  boostAudio.srcObject = _calloutMediaDest.stream;
+  boostAudio.volume = 1.0;
+  boostAudio.play().catch(() => {});
+  return _calloutGainNode;
+}
 
 function calloutSpeak(text) {
   if (!settings.callouts) return;
@@ -1627,9 +2108,16 @@ function processCalloutQueue() {
   showCalloutBanner(text);
   const utt = new SpeechSynthesisUtterance(text);
   utt.lang  = settings.calloutLang ?? 'en-US';
-  utt.rate  = 1.1;
-  utt.pitch = 0.9;
-  utt.volume = Math.min(1.0, (settings.calloutVol ?? 100) / 100);
+  utt.rate  = settings.calloutRate  ?? 0.92;
+  utt.pitch = settings.calloutPitch ?? 1.0;
+  // Über 100%: Web Speech auf max, Gain übernimmt den Rest
+  const vol = settings.calloutVol ?? 100;
+  utt.volume = 1.0;
+  // GainNode für Verstärkung über 100%
+  try {
+    const gain = getCalloutGain();
+    gain.gain.value = vol / 100;
+  } catch(e) {}
   utt.onend = () => setTimeout(processCalloutQueue, 200);
   utt.onerror = () => setTimeout(processCalloutQueue, 200);
   speechSynthesis.speak(utt);
@@ -1668,11 +2156,11 @@ function checkCallouts() {
   const flap     = lvarValues['S_FC_FLAPS']  ?? 0;
   const onGround = radioAlt < 10 && Math.abs(vs) < 200;
 
-  // ── Flap Callouts (immer) ──
+  // ── Flap Callouts ──
   const flapIdx = Math.round(Number(flap));
   if (calloutState.lastFlap !== -1 && flapIdx !== calloutState.lastFlap) {
     if (flapIdx >= 0 && flapIdx <= 4) {
-      calloutSpeak(CALLOUT_FLAP_NAMES[flapIdx]);
+      if (settings.calloutFlaps) calloutSpeak(CALLOUT_FLAP_NAMES[flapIdx]);
     }
   }
   calloutState.lastFlap = flapIdx;
@@ -1681,15 +2169,15 @@ function checkCallouts() {
   if (onGround || radioAlt < 400) {
     if (!calloutState.said100kt && spd >= 100) {
       calloutState.said100kt = true;
-      calloutSpeak('One hundred');
+      if (settings.calloutTakeoff) calloutSpeak('One hundred');
     }
     if (!calloutState.saidV1 && spd >= (settings.v1 ?? 145)) {
       calloutState.saidV1 = true;
-      calloutSpeak('V1');
+      if (settings.calloutTakeoff) calloutSpeak('V1');
     }
     if (!calloutState.saidRotate && spd >= (settings.vr ?? 150)) {
       calloutState.saidRotate = true;
-      calloutSpeak('Rotate');
+      if (settings.calloutTakeoff) calloutSpeak('Rotate');
     }
   }
 
@@ -1697,11 +2185,11 @@ function checkCallouts() {
   if (!onGround && radioAlt > 10 && radioAlt < 400) {
     if (!calloutState.saidPositive && vs > 200) {
       calloutState.saidPositive = true;
-      calloutSpeak('Positive climb');
+      if (settings.calloutAfterTO) calloutSpeak('Positive climb');
     }
     if (!calloutState.saidGearUp && calloutState.saidPositive && gear === 0) {
       calloutState.saidGearUp = true;
-      calloutSpeak('Gear up');
+      if (settings.calloutAfterTO) calloutSpeak('Gear up');
     }
   }
 
@@ -1711,38 +2199,36 @@ function checkCallouts() {
     for (const alt of approachCallouts) {
       if (radioAlt <= alt && calloutState.lastRadioCallout > alt) {
         calloutState.lastRadioCallout = alt;
-        calloutSpeak(String(alt));
+        if (settings.calloutApproach) calloutSpeak(String(alt));
         break;
       }
     }
   }
 
   // ── APU Available Callout ──
-  if (settings.engCallout) {
+  {
     const apuAvail  = lvarValues['I_OH_ELEC_APU_START_U'] ?? 0;
     const apuMaster = lvarValues['I_OH_ELEC_APU_MASTER_L'] ?? 0;
-    // Callout nur wenn Wert von 0 auf 1 wechselt
     if (!apuCalloutDone && _apuAvailLast === 0 && apuAvail === 1) {
       apuCalloutDone = true;
-      calloutSpeak('APU available');
+      if (settings.calloutApuAlive) calloutSpeak('APU available');
+      state['apu-avail'] = 'auto'; saveState(); render();
     }
     _apuAvailLast = apuAvail;
-    // Reset wenn APU Master AUS
     if (apuMaster === 0) { apuCalloutDone = false; }
   }
 
   // ── Engine Start / Alive Callouts ──
-  if (settings.engCallout) {
+  {
     const n2_1 = lvarValues['A_ENG1_N2']      ?? 0;
     const n2_2 = lvarValues['A_ENG2_N2']      ?? 0;
     const mst1 = lvarValues['S_ENG_MASTER_1'] ?? 1;
     const mst2 = lvarValues['S_ENG_MASTER_2'] ?? 1;
     if (!_engCalloutReady) { _engMst1Last = mst1; _engMst2Last = mst2; return; }
-    // Callout nur wenn Master von 1 (AUS) auf 0 (EIN) wechselt
-    if (!engCalloutState.eng2start && _engMst2Last === 1 && mst2 === 0) { engCalloutState.eng2start = true; calloutSpeak('Engine 2 start'); }
-    if (!engCalloutState.eng2alive && n2_2 > 58)  { engCalloutState.eng2alive = true; calloutSpeak('Engine 2 alive'); }
-    if (!engCalloutState.eng1start && _engMst1Last === 1 && mst1 === 0) { engCalloutState.eng1start = true; calloutSpeak('Engine 1 start'); }
-    if (!engCalloutState.eng1alive && n2_1 > 58)  { engCalloutState.eng1alive = true; calloutSpeak('Engine 1 alive'); }
+    if (!engCalloutState.eng2start && _engMst2Last === 1 && mst2 === 0) { engCalloutState.eng2start = true; if (settings.calloutEngStart)  calloutSpeak('Engine 2 start'); }
+    if (!engCalloutState.eng2alive && n2_2 > 58)                        { engCalloutState.eng2alive = true; if (settings.calloutEng2Alive) calloutSpeak('Engine 2 alive'); state['eng2-mon'] = 'auto'; state['eng2-alv'] = 'auto'; saveState(); render(); }
+    if (!engCalloutState.eng1start && _engMst1Last === 1 && mst1 === 0) { engCalloutState.eng1start = true; if (settings.calloutEngStart)  calloutSpeak('Engine 1 start'); }
+    if (!engCalloutState.eng1alive && n2_1 > 58)                        { engCalloutState.eng1alive = true; if (settings.calloutEng1Alive) calloutSpeak('Engine 1 alive'); state['eng1-mon'] = 'auto'; state['eng1-alv'] = 'auto'; saveState(); render(); }
     if (mst1 === 1 && mst2 === 1 && (engCalloutState.eng1start || engCalloutState.eng2start)) {
       engCalloutState = { eng1start:false, eng1alive:false, eng2start:false, eng2alive:false };
     }
@@ -1784,6 +2270,289 @@ let altWarnTimer   = null;
 
 function get100ftBucket(alt) {
   return Math.floor(alt / 100) * 100;
+}
+
+// ── Boarding Popup ────────────────────────────────────────────────────────
+const BP_ROWS = 30;
+const BP_COLS = 6; // A B C | D E F
+const EXIT_ROWS = [11, 12]; // Exit-Reihen
+let _bpSeats = []; // true = besetzt
+let _bpTotalPax = 180;
+let _bpBoardOrder = []; // zufällige Boarding-Reihenfolge (von hinten)
+
+function initBoardingSeats(total) {
+  _bpTotalPax = total || 180;
+  _bpSeats = Array(BP_ROWS * BP_COLS).fill(false);
+  // Boarding-Reihenfolge: hinten nach vorne, zufällig innerhalb Blöcken
+  _bpBoardOrder = [];
+  // Blöcke: Reihen 30→1, je Block 5 Reihen gemischt
+  for (let block = BP_ROWS; block >= 1; block -= 5) {
+    const rows = [];
+    for (let r = block; r > Math.max(0, block - 5); r--) rows.push(r);
+    // Innerhalb Block mischen
+    rows.sort(() => Math.random() - 0.5);
+    for (const row of rows) {
+      const cols = [0,1,2,3,4,5].sort(() => Math.random() - 0.5);
+      for (const col of cols) _bpBoardOrder.push((row-1) * 6 + col);
+    }
+  }
+  renderBoardingSeats();
+}
+
+function renderBoardingSeats() {
+  const leftEl  = document.getElementById('bp-seats-left');
+  const rightEl = document.getElementById('bp-seats-right');
+  const labelsEl = document.getElementById('bp-row-labels');
+  if (!leftEl) return;
+
+  leftEl.innerHTML = '';
+  rightEl.innerHTML = '';
+  labelsEl.innerHTML = '';
+
+  for (let row = 0; row < BP_ROWS; row++) {
+    const isExit = EXIT_ROWS.includes(row + 1);
+    const rowLabel = document.createElement('div');
+    rowLabel.style.cssText = `font-size:8px;color:#5a6a7e;height:10px;display:flex;align-items:center;`;
+    rowLabel.textContent = row + 1;
+    labelsEl.appendChild(rowLabel);
+
+    for (let col = 0; col < 3; col++) {
+      const idx = row * 6 + col;
+      const seat = document.createElement('div');
+      const occupied = _bpSeats[idx];
+      seat.style.cssText = `
+        height:10px;border-radius:2px;transition:background 0.4s ease;
+        background:${occupied ? '#22c55e' : isExit ? '#1e3a5f' : '#1e2e3e'};
+        ${isExit ? 'border:1px solid #00b4d8;' : ''}
+      `;
+      seat.id = `bp-seat-${idx}`;
+      leftEl.appendChild(seat);
+    }
+    for (let col = 3; col < 6; col++) {
+      const idx = row * 6 + col;
+      const seat = document.createElement('div');
+      const occupied = _bpSeats[idx];
+      seat.style.cssText = `
+        height:10px;border-radius:2px;transition:background 0.4s ease;
+        background:${occupied ? '#22c55e' : isExit ? '#1e3a5f' : '#1e2e3e'};
+        ${isExit ? 'border:1px solid #00b4d8;' : ''}
+      `;
+      seat.id = `bp-seat-${idx}`;
+      rightEl.appendChild(seat);
+    }
+  }
+}
+
+function updateBoardingSeats(boarded, total) {
+  if (!document.getElementById('boarding-popup') ||
+      document.getElementById('boarding-popup').style.display === 'none') return;
+
+  if (_bpTotalPax !== total && total > 0) initBoardingSeats(total);
+
+  // Sitze bis zur aktuellen Pax-Zahl befüllen
+  const toFill = Math.min(boarded, _bpBoardOrder.length);
+  for (let i = 0; i < toFill; i++) {
+    const idx = _bpBoardOrder[i];
+    if (!_bpSeats[idx]) {
+      _bpSeats[idx] = true;
+      const el = document.getElementById(`bp-seat-${idx}`);
+      if (el) el.style.background = '#22c55e';
+    }
+  }
+
+  // Header updaten
+  const pct = total > 0 ? Math.round((boarded / total) * 100) : 0;
+  const countEl = document.getElementById('bp-pax-count');
+  const pctEl   = document.getElementById('bp-pax-pct');
+  const barEl   = document.getElementById('bp-progress-bar');
+  const statusEl = document.getElementById('bp-status');
+  if (countEl) countEl.textContent = `${boarded} / ${total || '---'}`;
+  if (pctEl)   pctEl.textContent   = `${pct}%`;
+  if (barEl)   barEl.style.width   = `${pct}%`;
+  if (statusEl) {
+    if (boarded === 0) statusEl.textContent = 'Warte auf Boarding...';
+    else if (boarded >= total && total > 0) statusEl.textContent = '✓ Boarding abgeschlossen';
+    else statusEl.textContent = `Boarding läuft · ${total - boarded} Pax ausstehend`;
+  }
+}
+
+function openBoardingPopup() {
+  const boarded = lvarValues['FSDT_GSX_NUMPASSENGERS_BOARDING'] ?? 0;
+  const total   = lvarValues['FSDT_GSX_NUMPASSENGERS'] ?? 180;
+  if (window.electronAPI?.toggleBoarding) {
+    window.electronAPI.toggleBoarding({ boarded, total });
+  }
+}
+
+function openBoardingAuto() {
+  const boarded = lvarValues['FSDT_GSX_NUMPASSENGERS_BOARDING'] ?? 0;
+  const total   = lvarValues['FSDT_GSX_NUMPASSENGERS'] ?? 180;
+  if (window.electronAPI?.openBoarding) {
+    window.electronAPI.openBoarding({ boarded, total });
+  }
+}
+
+function checkGsxBoarding() {
+  const paxBoarding = lvarValues['FSDT_GSX_NUMPASSENGERS_BOARDING'] ?? 0;
+  const paxTotal    = lvarValues['FSDT_GSX_NUMPASSENGERS']          ?? 0;
+
+  // Boarding START: Pax springt von 0 auf > 0
+  if (!_gsxBoardingActive && paxBoarding > 0) {
+    _gsxBoardingActive = true;
+    _gsxPrevPax = paxBoarding;
+    if (settings.paAuto) playPA('BoardingWelcome');
+    openBoardingAuto();
+    console.log('[GSX] Boarding gestartet → BoardingWelcome');
+  }
+
+  // Boarding COMPLETE: boardende Pax >= Ziel
+  if (_gsxBoardingActive && paxTotal > 0 && paxBoarding >= paxTotal && _gsxPrevPax < paxTotal) {
+    _gsxPrevPax = paxBoarding;
+    if (settings.paAuto) playPA('BoardingComplete');
+    console.log('[GSX] Boarding complete → BoardingComplete');
+  }
+
+  // Reset wenn Boarding wieder auf 0
+  if (_gsxBoardingActive && paxBoarding === 0) {
+    _gsxBoardingActive = false;
+    _gsxPrevPax = 0;
+  }
+
+  _gsxPrevPax = paxBoarding;
+  updatePaxDisplay(paxBoarding, paxTotal);
+}
+
+function checkPaAutoTrigger() {
+  if (!settings.paAuto) return;
+
+  const beacon   = lvarValues['A_LT_BEACON']  ?? 0;
+  const alt      = lvarValues['A_ALT']        ?? 0;
+  const vs       = lvarValues['A_VS']         ?? 0;
+  const radioAlt = lvarValues['A_RADIO_ALT']  ?? 9999;
+  const gear     = lvarValues['S_MIP_GEAR']   ?? 0;
+  const onGround = radioAlt < 10 && Math.abs(vs) < 100;
+  const phase    = CHECKLISTS[currentPhaseIdx]?.id ?? '';
+
+  // ── ArmDoors → BEACON geht AN ──
+  if (!_paState.armDoors && _beaconLast === 0 && beacon === 1) {
+    _paState.armDoors = true;
+    playPA('ArmDoors');
+    setTimeout(() => {
+      if (!settings.paAuto) return;
+      const t = lvarValues['A_LOCAL_TIME'] ?? 0;
+      const h = Math.floor((t % 86400) / 3600);
+      let tod = 'MORNING';
+      if (h >= 12 && h < 17) tod = 'AFTERNOON';
+      else if (h >= 17 && h < 21) tod = 'EVENING';
+      else if (h >= 21 || h < 5) tod = 'NIGHT';
+      playPA(`PreSafetyBriefing[${tod}]`);
+    }, 3000);
+  }
+  _beaconLast = beacon;
+
+  // ── SafetyBriefing → ENG Mode Selector auf IGN/START (=2) ──
+  const engMode = lvarValues['S_ENG_MODE'] ?? 0;
+  if (!_paState.safety && _engModeLast !== 2 && engMode === 2) {
+    _paState.safety = true;
+    playPA('SafetyBriefing');
+  }
+  _engModeLast = engMode;
+
+  // ── CabinDimTakeoff → Lineup-Phase wird aktiv ──
+  if (!_paState.cabinDim && phase === 'lineup') {
+    _paState.cabinDim = true;
+    playPA('CabinDimTakeoff');
+  }
+
+  // ── AfterTakeoff → Gear UP nach Abheben ──
+  if (!_paState.afterTakeoff && !onGround && radioAlt > 100 && gear === 0 && _gearUpLast !== 0) {
+    _paState.afterTakeoff = true;
+    playPA('AfterTakeoff');
+  }
+  _gearUpLast = gear;
+
+  // ── FastenSeatbelts → Sinken durch FL100 ──
+  if (!_paState.seatbelts && !onGround && alt < 10000 && vs < -200 && _paState.afterTakeoff) {
+    _paState.seatbelts = true;
+    playPA('FastenSeatbelts');
+    setTimeout(() => { if (settings.paAuto) playPA('DescentSeatbelts'); }, 8000);
+  }
+
+  // ── CrewSeatsLanding → Radioalt < 1000 ft sinkend ──
+  if (!_paState.crewSeats && !onGround && radioAlt < 1000 && radioAlt > 50 && vs < -100) {
+    _paState.crewSeats = true;
+    playPA('CrewSeatsLanding');
+  }
+
+  // ── AfterLanding → Touchdown ──
+  if (!_paState.afterLanding && onGround && !_onGroundLast && _paState.afterTakeoff) {
+    _paState.afterLanding = true;
+    setTimeout(() => { if (settings.paAuto) playPA('AfterLanding'); }, 15000);
+  }
+
+  // ── DisarmDoors → Parking-Phase wird aktiv ──
+  if (!_paState.disarmDoors && phase === 'parking') {
+    _paState.disarmDoors = true;
+    playPA('DisarmDoors');
+  }
+
+  // Reset für neuen Flug
+  if (phase === 'cockpit-prep-1' && _paState.afterLanding) {
+    _paState = { armDoors:false, safety:false, cabinDim:false, afterTakeoff:false,
+                 seatbelts:false, crewSeats:false, disarmDoors:false, afterLanding:false };
+    _beaconLast = 0; _gearUpLast = 0;
+  }
+
+  _onGroundLast = onGround;
+}
+
+function buildPaParking() {
+  const box = document.createElement('div');
+  box.style.cssText = 'margin:8px 0 4px;padding:10px 12px;background:#0d1f2d;border:1px solid #1e2e3e;border-radius:6px;';
+  box.innerHTML = `
+    <div style="font-size:9px;color:#5a6a7e;letter-spacing:2px;margin-bottom:8px;">CABIN ANNOUNCEMENT</div>
+    <div style="display:flex;flex-direction:column;gap:6px;">
+      <button onclick="playPA('DisembarkStarted')" style="
+        background:#0a1929;border:1px solid #1e3a5f;color:#c8d6e5;
+        padding:7px 12px;border-radius:5px;font-size:11px;cursor:pointer;
+        display:flex;align-items:center;gap:8px;text-align:left;">
+        <span style="color:#00b4d8;font-size:14px;">▶</span>
+        <span>Disembark Started</span>
+      </button>
+    </div>
+  `;
+  return box;
+}
+
+function updatePaxDisplay(boarded, total) {
+  const el = document.getElementById('gsx-pax-display');
+  if (el) {
+    const pct = total > 0 ? Math.round((boarded / total) * 100) : 0;
+    const color = boarded >= total && total > 0 ? '#22c55e' : '#c8d6e5';
+    el.innerHTML = `
+      <span style="font-size:11px;color:#5a6a7e;letter-spacing:1px;">PAX BOARDING</span>
+      <span style="font-size:18px;font-weight:bold;color:${color};font-family:monospace">${boarded}<span style="font-size:12px;color:#5a6a7e"> / ${total > 0 ? total : '---'}</span></span>
+      ${total > 0 ? `<span style="font-size:10px;color:${color}">${pct}%</span>` : ''}
+    `;
+  }
+  // Boarding-Fenster live updaten
+  if (window.electronAPI?.updateBoarding) {
+    window.electronAPI.updateBoarding({ boarded, total });
+  }
+  // altes In-App-Popup ebenfalls updaten (Fallback)
+  updateBoardingSeats(boarded, total);
+}
+
+function updateGsDisplay() {
+  const el = document.getElementById('gs-display');
+  if (!el) return;
+  const gs = Math.round(lvarValues["A_GROUNDSPEED"] ?? 0);
+  const color = gs >= 30 ? '#ef4444' : gs >= 25 ? '#eab308' : '#c8d6e5';
+  el.innerHTML = `
+    <span style="font-size:11px;color:#5a6a7e;letter-spacing:1px;">GROUNDSPEED</span>
+    <span style="font-size:22px;font-weight:bold;color:${color}">${gs}</span>
+    <span style="font-size:11px;color:#5a6a7e;">kt</span>
+  `;
 }
 
 function checkAltitudeWarning() {
@@ -1861,6 +2630,27 @@ function toggleCollapse() {
 
 loadSettings();
 
+// ─── PA Airline Dropdown befüllen ────────────────────────────────
+async function initPaAirlineSelect() {
+  const sel = document.getElementById('sel-pa-airline');
+  if (!sel || !window.electronAPI?.getPaAirlines) return;
+  try {
+    const airlines = await window.electronAPI.getPaAirlines();
+    if (!airlines || airlines.length === 0) return;
+    sel.innerHTML = '';
+    airlines.forEach(name => {
+      const opt = document.createElement('option');
+      opt.value = name;
+      opt.textContent = name.charAt(0).toUpperCase() + name.slice(1);
+      if (name === (settings.paAirline || 'condor')) opt.selected = true;
+      sel.appendChild(opt);
+    });
+  } catch(e) {
+    console.warn('[PA] Airline-Ordner konnten nicht geladen werden:', e);
+  }
+}
+initPaAirlineSelect();
+
 // ─── Shortcut Recorder ───────────────────────────────────────────
 let _scRecording = false;
 
@@ -1927,7 +2717,7 @@ render();
 
 // ─── Begrüßung durch Copiloten ───
 function playGreeting() {
-  if (!settings.callouts) return;
+  if (!settings.calloutGreeting) return;
   const simSeconds = lvarValues['A_LOCAL_TIME'];
   let hour;
   if (simSeconds !== undefined && simSeconds > 0) {
@@ -1971,5 +2761,83 @@ if (settings.autoConnect) setTimeout(() => {
   }, 2000);
 }, 1000);
 </script>
+<!-- ── Boarding Popup ─────────────────────────────────────────── -->
+<div id="boarding-popup" style="display:none;position:fixed;inset:0;z-index:9999;
+  background:rgba(0,0,0,0.85);backdrop-filter:blur(4px);
+  align-items:center;justify-content:center;">
+  <div style="background:#0d1117;border:1px solid #1e2e3e;border-radius:12px;
+    width:480px;max-height:90vh;overflow:hidden;display:flex;flex-direction:column;
+    box-shadow:0 0 40px rgba(0,180,216,0.15);">
+
+    <!-- Header -->
+    <div style="padding:14px 18px;border-bottom:1px solid #1e2e3e;
+      display:flex;align-items:center;justify-content:space-between;">
+      <div>
+        <div style="font-size:11px;color:#00b4d8;letter-spacing:2px;font-weight:600;">BOARDING</div>
+        <div id="bp-flight-info" style="font-size:10px;color:#5a6a7e;margin-top:2px;">A320 · 180 PAX</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div style="text-align:right;">
+          <div id="bp-pax-count" style="font-size:20px;font-weight:700;color:#c8d6e5;font-family:monospace;">0 / 0</div>
+          <div id="bp-pax-pct" style="font-size:10px;color:#5a6a7e;">0%</div>
+        </div>
+        <button onclick="closeBoardingPopup()" style="
+          background:transparent;border:1px solid #1e2e3e;color:#5a6a7e;
+          width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:14px;
+          display:flex;align-items:center;justify-content:center;">×</button>
+      </div>
+    </div>
+
+    <!-- Progress Bar -->
+    <div style="padding:10px 18px;border-bottom:1px solid #1e2e3e;">
+      <div style="background:#0a1929;border-radius:4px;height:6px;overflow:hidden;">
+        <div id="bp-progress-bar" style="height:100%;width:0%;background:linear-gradient(90deg,#0077a8,#00b4d8);
+          transition:width 1s ease;border-radius:4px;"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:9px;color:#5a6a7e;">
+        <span>DOOR 1L</span><span>ROWS 1–30</span><span>DOOR 4R</span>
+      </div>
+    </div>
+
+    <!-- Seat Map -->
+    <div style="padding:12px 18px;overflow-y:auto;flex:1;">
+      <!-- Legend -->
+      <div style="display:flex;gap:16px;margin-bottom:10px;font-size:9px;color:#5a6a7e;">
+        <span style="display:flex;align-items:center;gap:4px;">
+          <span style="width:10px;height:10px;background:#1e2e3e;border-radius:2px;display:inline-block;"></span>FREI
+        </span>
+        <span style="display:flex;align-items:center;gap:4px;">
+          <span style="width:10px;height:10px;background:#22c55e;border-radius:2px;display:inline-block;"></span>BESETZT
+        </span>
+        <span style="display:flex;align-items:center;gap:4px;">
+          <span style="width:10px;height:10px;background:#1e3a5f;border-radius:2px;display:inline-block;border:1px solid #00b4d8;"></span>EXIT
+        </span>
+      </div>
+
+      <!-- Row Labels + Seats -->
+      <div style="display:flex;gap:4px;">
+        <!-- Left seats A-B-C -->
+        <div style="flex:1;">
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:2px;" id="bp-seats-left"></div>
+        </div>
+        <!-- Aisle -->
+        <div style="width:18px;display:flex;flex-direction:column;gap:2px;align-items:center;" id="bp-row-labels"></div>
+        <!-- Right seats D-E-F -->
+        <div style="flex:1;">
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:2px;" id="bp-seats-right"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div style="padding:10px 18px;border-top:1px solid #1e2e3e;display:flex;justify-content:space-between;align-items:center;">
+      <div id="bp-status" style="font-size:10px;color:#5a6a7e;">Warte auf Boarding...</div>
+      <button onclick="closeBoardingPopup()" style="
+        background:#0a1929;border:1px solid #1e3a5f;color:#c8d6e5;
+        padding:5px 14px;border-radius:5px;font-size:10px;cursor:pointer;">SCHLIESSEN</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
