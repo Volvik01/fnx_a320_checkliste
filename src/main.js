@@ -1,6 +1,15 @@
-const { app, BrowserWindow, ipcMain, globalShortcut } = require('electron');
+const { app, BrowserWindow, ipcMain, globalShortcut, utilityProcess } = require('electron');
 const path = require('path');
 const fs   = require('fs');
+
+// ── File Logger ──────────────────────────────────────────────────────────────
+const logFile = path.join(require('os').tmpdir(), 'fenix-bridge.log');
+fs.writeFileSync(logFile, `=== START ${new Date().toISOString()} ===\n`);
+function log(msg) {
+  const line = `[${new Date().toISOString()}] ${msg}\n`;
+  fs.appendFileSync(logFile, line);
+  console.log(msg);
+}
 
 // WS_EX_NOACTIVATE via Windows API setzen
 // Verhindert dass das Fenster jemals den Fokus vom Sim nimmt
@@ -94,25 +103,154 @@ ipcMain.handle('set-shortcut', (e, sc) => {
 // IPC: Aktuellen Shortcut abfragen
 ipcMain.handle('get-shortcut', () => loadShortcut());
 
-let bridgeProcess = null;
+// IPC: DevTools öffnen/schließen
+ipcMain.on('toggle-devtools', () => {
+  if (mainWindow) mainWindow.webContents.toggleDevTools();
+});
+
+// IPC: PA Airline-Ordner aus audio/PA/ auslesen
+ipcMain.handle('get-pa-airlines', () => {
+  try {
+    const paPath = app.isPackaged
+      ? path.join(process.resourcesPath, 'audio', 'PA')
+      : path.join(__dirname, '..', 'audio', 'PA');
+    if (!fs.existsSync(paPath)) return [];
+    return fs.readdirSync(paPath)
+      .filter(f => fs.statSync(path.join(paPath, f)).isDirectory());
+  } catch(e) {
+    log('[MAIN] PA-Ordner Fehler: ' + e.message);
+    return [];
+  }
+});
+
+// ── Boarding Window ──────────────────────────────────────────────────────────
+let boardingWindow = null;
+let _lastBoardingState = { boarded: 0, total: 0 };
+const boardingPosFile = path.join(app.getPath('userData'), 'boarding-pos.json');
+
+function loadBoardingPos() {
+  try { return JSON.parse(fs.readFileSync(boardingPosFile, 'utf8')); } catch(e) {}
+  return { x: undefined, y: undefined, width: 1100, height: 220 };
+}
+
+function saveBoardingPos(win) {
+  try {
+    if (!win || win.isDestroyed()) return;
+    fs.writeFileSync(boardingPosFile, JSON.stringify(win.getBounds()));
+  } catch(e) {}
+}
+
+ipcMain.on('boarding-open', (e, state) => {
+  _lastBoardingState = state || { boarded: 0, total: 180 };
+  if (boardingWindow && !boardingWindow.isDestroyed()) {
+    boardingWindow.webContents.send('boarding-update', _lastBoardingState);
+    return;
+  }
+  const bpos = loadBoardingPos();
+  boardingWindow = new BrowserWindow({
+    width: bpos.width || 1100, height: bpos.height || 88,
+    x: bpos.x, y: bpos.y,
+    minWidth: 300, minHeight: 80,
+    frame: false,
+    transparent: false,
+    alwaysOnTop: true,
+    resizable: true,
+    focusable: true,
+    skipTaskbar: false,
+    webPreferences: {
+      nodeIntegration: true,
+      contextIsolation: false,
+    },
+    icon: path.join(__dirname, '../assets/icon.ico'),
+    backgroundColor: '#080e18',
+  });
+  boardingWindow.loadFile(path.join(__dirname, 'boarding.html'));
+  boardingWindow.once('ready-to-show', () => {
+    boardingWindow.webContents.send('boarding-update', _lastBoardingState);
+  });
+  boardingWindow.on('moved',   () => saveBoardingPos(boardingWindow));
+  boardingWindow.on('resized', () => saveBoardingPos(boardingWindow));
+  boardingWindow.on('closed', () => { saveBoardingPos(boardingWindow); boardingWindow = null; });
+});
+
+ipcMain.on('boarding-update', (e, state) => {
+  _lastBoardingState = state;
+  if (boardingWindow && !boardingWindow.isDestroyed()) {
+    boardingWindow.webContents.send('boarding-update', state);
+  }
+});
+
+ipcMain.on('boarding-get-state', (e) => {
+  e.sender.send('boarding-update', _lastBoardingState);
+});
+
+ipcMain.on('boarding-close', () => {
+  if (boardingWindow && !boardingWindow.isDestroyed()) boardingWindow.close();
+});
+
+ipcMain.on('boarding-toggle', (e, state) => {
+  if (boardingWindow && !boardingWindow.isDestroyed()) {
+    saveBoardingPos(boardingWindow);
+    boardingWindow.close();
+  } else {
+    _lastBoardingState = state || { boarded: 0, total: 180 };
+    const bpos = loadBoardingPos();
+    boardingWindow = new BrowserWindow({
+      width: bpos.width || 1100, height: bpos.height || 88,
+      x: bpos.x, y: bpos.y,
+      minWidth: 300, minHeight: 80,
+      frame: false,
+      transparent: false,
+      alwaysOnTop: true,
+      resizable: true,
+      focusable: true,
+      skipTaskbar: false,
+      webPreferences: { nodeIntegration: true, contextIsolation: false },
+      icon: path.join(__dirname, '../assets/icon.ico'),
+      backgroundColor: '#080e18',
+    });
+    boardingWindow.loadFile(path.join(__dirname, 'boarding.html'));
+    boardingWindow.setAlwaysOnTop(true, 'screen-saver');
+    boardingWindow.once('ready-to-show', () => {
+      boardingWindow.webContents.send('boarding-update', _lastBoardingState);
+    });
+    boardingWindow.on('moved',   () => saveBoardingPos(boardingWindow));
+    boardingWindow.on('resized', () => saveBoardingPos(boardingWindow));
+    boardingWindow.on('closed', () => { saveBoardingPos(boardingWindow); boardingWindow = null; });
+  }
+});
+
+let bridgeWindow = null;
 
 function startBridge() {
-  const { spawn } = require('child_process');
-  const bridgePath = path.join(__dirname, '..', 'bridge', 'bridge.js');
-  bridgeProcess = spawn(process.execPath, [bridgePath], {
-    detached: false,
-    stdio: 'ignore'
-  });
-  bridgeProcess.on('exit', () => { bridgeProcess = null; });
-  console.log('[MAIN] Bridge gestartet');
+  try {
+    const bridgePath = app.isPackaged
+      ? path.join(process.resourcesPath, 'app.asar.unpacked', 'bridge', 'bridge.js')
+      : path.join(__dirname, '..', 'bridge', 'bridge.js');
+
+    const nodeModulesPath = app.isPackaged
+      ? path.join(process.resourcesPath, 'app.asar.unpacked', 'node_modules')
+      : path.join(__dirname, '..', 'node_modules');
+
+    // NODE_PATH setzen damit require() die Module findet
+    process.env.NODE_PATH = nodeModulesPath;
+    require('module').Module._initPaths();
+
+    log('[MAIN] Bridge laden: ' + bridgePath);
+    log('[MAIN] NODE_PATH: ' + nodeModulesPath);
+    log('[MAIN] Datei existiert: ' + fs.existsSync(bridgePath));
+    log('[MAIN] node_modules existiert: ' + fs.existsSync(nodeModulesPath));
+    log('[MAIN] ws existiert: ' + fs.existsSync(path.join(nodeModulesPath, 'ws')));
+    log('[MAIN] node-simconnect existiert: ' + fs.existsSync(path.join(nodeModulesPath, 'node-simconnect')));
+    require(bridgePath);
+    log('[MAIN] Bridge geladen');
+  } catch(e) {
+    log('[MAIN] Bridge Fehler: ' + e.message + '\n' + e.stack);
+  }
 }
 
 function stopBridge() {
-  if (bridgeProcess) {
-    try { bridgeProcess.kill(); } catch(e) {}
-    bridgeProcess = null;
-    console.log('[MAIN] Bridge beendet');
-  }
+  // Bridge läuft im selben Prozess, kein Kill nötig
 }
 
 function createWindow() {
@@ -139,6 +277,9 @@ function createWindow() {
   });
 
   mainWindow.loadFile(path.join(__dirname, 'index.html'));
+
+  // Console für Entwicklung öffnen (optional)
+  //mainWindow.webContents.openDevTools({ mode: 'detach' });
   mainWindow.setAlwaysOnTop(true, 'screen-saver');
 
   // WS_EX_NOACTIVATE setzen sobald Fenster bereit ist
@@ -213,14 +354,22 @@ ipcMain.on('close-window', () => {
 });
 
 app.whenReady().then(() => {
+  log('[MAIN] App bereit');
   createWindow();
   registerShortcut(loadShortcut());
+  log('[MAIN] Starte Bridge...');
+  try {
+    startBridge();
+  } catch(e) {
+    log('[MAIN] Bridge Fehler: ' + e.message + '\n' + e.stack);
+  }
+  log('[MAIN] Bridge-Aufruf abgeschlossen');
+  log('[MAIN] Log-Datei: ' + logFile);
 });
 
 app.on('will-quit', () => {
   globalShortcut.unregisterAll();
   stopBridge();
-  // Node.js Prozesse beenden (Bridge)
   try {
     const { execSync } = require('child_process');
     execSync('taskkill /F /IM node.exe /T', { timeout: 3000 });

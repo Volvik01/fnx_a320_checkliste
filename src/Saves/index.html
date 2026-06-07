@@ -458,6 +458,10 @@
     <span id="titlebar-sub">NORMAL CHECKLIST</span>
     <div id="titlebar-btns">
       <button id="btn-settings" title="Einstellungen" onclick="openSettings()">⚙</button>
+      <button id="btn-turbulence" title="Turbulence PA" onclick="playPA('Turbulence')" style="
+        background:transparent;border:1px solid #1e3a5f;color:#c8d6e5;
+        padding:2px 7px;border-radius:4px;font-size:13px;cursor:pointer;
+        margin-right:2px;" title="Turbulence Ansage">⚡</button>
       <button class="tbar-btn" id="btn-collapse" title="Einklappen" onclick="toggleCollapse()">▲</button>
       <button class="tbar-btn" id="btn-close" onclick="window.electronAPI.close()">×</button>
     </div>
@@ -491,6 +495,26 @@
           </div>
           <label class="toggle-switch">
             <input type="checkbox" id="tog-descent" onchange="saveSettings()">
+            <div class="toggle-slider"></div>
+          </label>
+        </div>
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">FL100 Callout – Steigflug</div>
+            <div class="setting-sub">"Ten thousand feet, lights off"</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="tog-callout-climb" onchange="saveSettings()">
+            <div class="toggle-slider"></div>
+          </label>
+        </div>
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">FL100 Callout – Sinkflug</div>
+            <div class="setting-sub">"Ten thousand feet, lights on"</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="tog-callout-descent" onchange="saveSettings()">
             <div class="toggle-slider"></div>
           </label>
         </div>
@@ -575,11 +599,101 @@
         <div class="setting-group-title">CALLOUTS</div>
         <div class="setting-row">
           <div>
-            <div class="setting-label">Callouts aktivieren</div>
+            <div class="setting-label">Callouts aktivieren (Master)</div>
             <div class="setting-sub">Airbus Callouts via Text-to-Speech</div>
           </div>
           <label class="toggle-switch">
             <input type="checkbox" id="tog-callouts" onchange="saveSettings()">
+            <div class="toggle-slider"></div>
+          </label>
+        </div>
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">Takeoff</div>
+            <div class="setting-sub">One hundred · V1 · Rotate</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="tog-callout-takeoff" onchange="saveSettings()">
+            <div class="toggle-slider"></div>
+          </label>
+        </div>
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">After Takeoff</div>
+            <div class="setting-sub">Positive climb · Gear up</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="tog-callout-afterto" onchange="saveSettings()">
+            <div class="toggle-slider"></div>
+          </label>
+        </div>
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">Flaps</div>
+            <div class="setting-sub">Flaps Up · 1 · 2 · 3 · Full</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="tog-callout-flaps" onchange="saveSettings()">
+            <div class="toggle-slider"></div>
+          </label>
+        </div>
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">Approach Altimeter</div>
+            <div class="setting-sub">1000 · 500 · 400 · … · 10 ft</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="tog-callout-approach" onchange="saveSettings()">
+            <div class="toggle-slider"></div>
+          </label>
+        </div>
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">APU Available</div>
+            <div class="setting-sub">"APU available"</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="tog-callout-apu-alive" onchange="saveSettings()">
+            <div class="toggle-slider"></div>
+          </label>
+        </div>
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">Engine Start</div>
+            <div class="setting-sub">"Engine 1/2 start"</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="tog-callout-eng-start" onchange="saveSettings()">
+            <div class="toggle-slider"></div>
+          </label>
+        </div>
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">Engine 1 Alive</div>
+            <div class="setting-sub">"Engine 1 alive"</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="tog-callout-eng1-alive" onchange="saveSettings()">
+            <div class="toggle-slider"></div>
+          </label>
+        </div>
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">Engine 2 Alive</div>
+            <div class="setting-sub">"Engine 2 alive"</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="tog-callout-eng2-alive" onchange="saveSettings()">
+            <div class="toggle-slider"></div>
+          </label>
+        </div>
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">Begrüßung</div>
+            <div class="setting-sub">"Good morning/afternoon Captain"</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="tog-callout-greeting" onchange="saveSettings()">
             <div class="toggle-slider"></div>
           </label>
         </div>
@@ -618,6 +732,71 @@
             <option value="en-GB">English (GB)</option>
             <option value="de-DE">Deutsch</option>
           </select>
+        </div>
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">Lautstärke</div>
+            <div class="setting-sub" id="callout-vol-label">100%</div>
+          </div>
+          <input type="range" id="inp-volume" min="0" max="400" value="100" step="10"
+            oninput="document.getElementById('callout-vol-label').textContent=this.value+'%'"
+            onchange="saveSettings()"
+            style="width:100px;accent-color:var(--accent);cursor:pointer;">
+        </div>
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">Sprechtempo</div>
+            <div class="setting-sub" id="callout-rate-label">0.92</div>
+          </div>
+          <input type="range" id="inp-rate" min="0.5" max="2.0" value="0.92" step="0.05"
+            oninput="document.getElementById('callout-rate-label').textContent=parseFloat(this.value).toFixed(2)"
+            onchange="saveSettings()"
+            style="width:100px;accent-color:var(--accent);cursor:pointer;">
+        </div>
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">Tonhöhe</div>
+            <div class="setting-sub" id="callout-pitch-label">1.0</div>
+          </div>
+          <input type="range" id="inp-pitch" min="0.5" max="2.0" value="1.0" step="0.05"
+            oninput="document.getElementById('callout-pitch-label').textContent=parseFloat(this.value).toFixed(2)"
+            onchange="saveSettings()"
+            style="width:100px;accent-color:var(--accent);cursor:pointer;">
+        </div>
+      </div>
+
+      <div class="setting-group">
+        <div class="setting-group-title">CABIN ANNOUNCEMENT</div>
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">Airline Set</div>
+            <div class="setting-sub">PA Audio-Paket auswählen</div>
+          </div>
+          <select id="sel-pa-airline" onchange="saveSettings()" style="
+            background:#0a1929;border:1px solid #1e3a5f;color:#c8d6e5;
+            padding:5px 8px;border-radius:5px;font-size:11px;cursor:pointer;">
+            <option value="condor">Condor</option>
+            <option value="lufthansa">Lufthansa</option>
+          </select>
+        </div>
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">PA Auto-Trigger</div>
+            <div class="setting-sub">Ansagen automatisch abspielen</div>
+          </div>
+          <label class="toggle-switch">
+            <input type="checkbox" id="tog-pa-auto" onchange="saveSettings()">
+            <div class="toggle-slider"></div>
+          </label>
+        </div>
+        <div class="setting-row">
+          <div>
+            <div class="setting-label">PA Lautstärke</div>
+            <div class="setting-sub" id="pa-vol-label">100%</div>
+          </div>
+          <input type="range" id="inp-pa-volume" min="0" max="200" value="100" step="10"
+            oninput="document.getElementById('pa-vol-label').textContent=this.value+'%'; saveSettings()"
+            style="width:80px;accent-color:var(--accent);">
         </div>
       </div>
 
@@ -684,7 +863,7 @@ const CHECKLISTS = [
       items: [
         { id:'atis',      action:'ATIS',                    value:'ByondATC',        lvar:null },
         { id:'bat12',     action:'Battery 1 & 2',           value:'ON',              lvar:'S_OH_ELEC_BAT2', lval:1 },
-        { id:'extpwr',    action:'External Power',          value:'AS REQ / ON',     lvar:'I_OH_ELEC_EXT_PWR_U', lval:0 },
+        { id:'extpwr',    action:'External Power',          value:'AS REQ / ON',     lvar:'I_OH_ELEC_EXT_PWR_U', lval:0, noAutoUncheck: true },
         { id:'nav-logo',  action:'Nav & Logo Lights',       value:'ON',              lvar:'A_LT_NAV', lval:1 },
         { id:'no-smk',    action:'No Smoking',              value:'AUTO',            lvar:'S_OH_SIGNS_SMOKING', lval:1 },
         { id:'emer-lt',   action:'Emergency Exit Lights',   value:'ARM',             lvar:'S_OH_INT_LT_EMER', lval:1 },
@@ -705,6 +884,7 @@ const CHECKLISTS = [
     id: 'mcdu-pushback', label: 'MCDU', name: 'MCDU SETUP & PUSHBACK',
     sections: [{
       title: 'SETUP & PUSHBACK',
+      paBoarding: true,
       items: [
         { id:'atc-clear', action:'ATC Clearance IFR',       value:'ByondATC',        lvar:null },
         { id:'gsx-open',  action:'Ingamepanel GSX',         value:'ÖFFNEN',          lvar:null },
@@ -728,7 +908,7 @@ const CHECKLISTS = [
         { id:'fcu-spd',   action:'FCU SPD',                 value:'CHECK DASHED',    lvar:'B_FCU_SPEED_DASHED', lval:1, noAutoOnStart: true },
         { id:'fcu-hdg',   action:'FCU HDG',                 value:'CHECK DASHED',    lvar:'B_FCU_HEADING_DASHED', lval:1, noAutoOnStart: true },
         { id:'fcu-alt',   action:'FCU ALT SEL',             value:'SET ALTITUDE',    lvar:null },
-        { id:'thr-idle',  action:'Thrust Levers',           value:'IDLE',            lvar:'A_FC_THROTTLE_LEFT_INPUT', lval:2, noAutoOnStart: true, lvar2:'A_FC_THROTTLE_RIGHT_INPUT', lval2:2, noAutoOnStart: true },
+        { id:'thr-idle',  action:'Thrust Levers',           value:'IDLE',            lvar:'A_FC_THROTTLE_LEFT_INPUT', lval:2, lvar2:'A_FC_THROTTLE_RIGHT_INPUT', lval2:2 },
         { id:'pws',       action:'Pred. Windshear PWS',     value:'OFF',             lvar:'S_WR_PRED_WS', lval:0 },
         { id:'wx-on',     action:'Weather Radar',           value:'OFF',             lvar:'S_WR_SYS', lval:1 },
 		    // My S_XPDR_OPERATION = 1 ist: Auto
@@ -744,7 +924,7 @@ const CHECKLISTS = [
     sections: [{
       title: 'START SEQUENCE',
       items: [
-        { id:'park-brk',  action:'PARKING BRAKE',           value:'SET',             lvar:'A_PARK_BRAKE', lval:1 },
+        { id:'park-brk',  action:'PARKING BRAKE',           value:'SET',             lvar:'A_PARK_BRAKE', lval:1, noAutoUncheck: true },
         { id:'apu-bleed2',action:'APU Bleed',               value:'VERIFY ON',       lvar:'S_OH_PNEUMATIC_APU_BLEED', lval:1 },
         { id:'eng-mode',  action:'ENG Mode Selector',       value:'IGN/START',       lvar:'S_ENG_MODE', lval:2 },
 		    //My old: { id:'eng2-mst',  action:'ENG 2 Master Switch',     value:'ON'     lvar:null },
@@ -768,21 +948,22 @@ const CHECKLISTS = [
         { id:'eng-norm',  action:'ENG Mode Selector',       value:'NORM',            lvar:'S_ENG_MODE', lval:1 },
         { id:'apu-bl-off',action:'APU Bleed',               value:'OFF',             lvar:'S_OH_PNEUMATIC_APU_BLEED', lval:0 },
         { id:'apu-off',   action:'APU Master',              value:'OFF',             lvar:'I_OH_ELEC_APU_MASTER_L', lval:0 },
+        { id:'anti-ice2', action:'ANTI ICE',                value:'AS REQ 10°C',     lvar:null },
         { id:'anti-ice',  action:'Engine & Wing Anti-Ice',  value:'AS REQ',          lvar:null },
         { id:'autobrk',   action:'Auto Brake',              value:'MAX',             lvar:'I_MIP_AUTOBRAKE_MAX_L', lval:1 },
-        { id:'pws',       action:'Pred. Windshear PWS',     value:'ON',              lvar:'S_WR_PRED_WS', lval:0, noAutoOnStart: true },
-        { id:'wx-on',     action:'Weather Radar',           value:'ON',              lvar:'S_WR_SYS', lval:1, noAutoOnStart: true },
+        { id:'pws3',       action:'Pred. Windshear PWS',    value:'ON',              lvar:'S_WR_PRED_WS', lval:1, noAutoOnStart: true },
+        { id:'wx-on3',     action:'Weather Radar',          value:'ON',              lvar:'S_WR_SYS', lval:0,},
         // { id:'flaps-to', action:'Flaps SET FOR T.O.',    value:'AS CALCULATED',   lvar:'S_FC_FLAPS', lval:null },
-		    { id:'flaps-to',  action:'Flaps SET FOR T.O.',       value:'AS CALCULATED',  lvar:'S_FC_FLAPS', lgt:0 },
-        { id:'spoilers',  action:'Ground Spoilers',         value:'ARM',             lvar:'A_FC_SPEEDBRAKE', lval:0, noAutoOnStart: true },
+		    { id:'flaps-to',  action:'Flaps SET FOR T.O.',      value:'AS CALCULATED',   lvar:'S_FC_FLAPS', lgt:0 },
+        { id:'spoilers3',  action:'Ground Spoilers',        value:'ARM',             lvar:'A_FC_SPEEDBRAKE', lval:0, noAutoOnStart: true },
         { id:'rud-trim',  action:'Rudder & Aileron Trim',   value:'ZERO',            lvar:'S_FC_RUDDER_TRIM_RESET', lgt:0 },
         //{ id:'rud-trim',  action:'Rudder & Aileron Trim',    value:'ZERO',           lvar:'A_FC_RUDDER_TRIM', lval:1 },
         // { id:'pit-trim',  action:'Pitch Trim',              value:'AS CALCULATED',   lvar:null },
-		    { id:'trim-set',  action:'Elevator Trim',            value:'SET',            lvar:'A_FC_ELEVATOR_TRIM', lval:'A_FC_ELEVATOR_TRIM' },
+		    { id:'trim-set',  action:'Elevator Trim',           value:'SET',             lvar:'A_FC_ELEVATOR_TRIM', lval:'A_FC_ELEVATOR_TRIM' },
+        { id:'terr-on',  action:'Terrain On ND',            value:'ON',              lvar:'I_MIP_GPWS_TERRAIN_ON_ND_CAPT_L', lval:1 },
         { id:'flt-ctrl',  action:'Flight Controls',         value:'FREE MOVEMENT',   lvar:null },
-        { id:'anti-ice2', action:'ANTI ICE',                value:'AS REQ 10°C',     lvar:null },
         { id:'ecam-stat', action:'ECAM STATUS',             value:'CHECKED',         lvar:null },
-        { id:'to-config', action:'TO Config Test',          value:'PUSH',            lvar:'I_ECAM_TO', lval:1 },
+        { id:'to-config', action:'TO Config Test',          value:'PUSH',            lvar:null },
       ]
     }]
   },
@@ -808,6 +989,7 @@ const CHECKLISTS = [
         { id:'strobe',    action:'Strobe Lights',           value:'ON',              lvar:'A_LT_STROBE', lval:1 },
         { id:'tcas-on',   action:'TCAS',                    value:'TA/RA',           lvar:'S_XPDR_MODE', lval:2 },
         { id:'packs-req', action:'Pack 1 & 2',              value:'AS REQ',          lvar:null },
+        { id:'packs-off',  action:'PACK 1 & 2',              value:'OFF',              lvar:'I_OH_PNEUMATIC_PACK_2_L', lval:1 },
         { id:'anti-ice3', action:'ENG & Wing Anti-Ice',     value:'AS REQ',          lvar:null },
       ]
     }]
@@ -830,15 +1012,15 @@ const CHECKLISTS = [
         { id:'gear-up',   action:'Landing Gear',            value:'VERIFY UP',       lvar:'S_MIP_GEAR', lval:0 },
         { id:'flap-ret',  action:'Flaps',                   value:'VERIFY RETRACTED',lvar:'S_FC_FLAPS', lval:0 },
         //{ id:'spd-disarm',action:'Ground Spoilers',         value:'DISARM',          lvar:'A_FC_SPEEDBRAKE', lval:0 },
-        { id:'spoilers',  action:'Ground Spoilers',         value:'ARM',             lvar:'A_FC_SPEEDBRAKE', lval:1 },
-        { id:'packs-on',  action:'PACK 1 & 2',              value:'ON',              lvar:'S_OH_PNEUMATIC_PACK_1', lval:1 },
+        { id:'spoilers',  action:'Ground Spoilers',         value:'DISARM',          lvar:'A_FC_SPEEDBRAKE', lval:1 },
+        { id:'packs-on',  action:'PACK 1 & 2',              value:'ON',              lvar:'I_OH_PNEUMATIC_PACK_2_L', lval:0 },
       ]
     }, {
       title: 'ABOVE FL100',
       items: [
         { id:'ldg-off',   action:'Landing Lights',          value:'OFF',             lvar:'A_LT_LANDING', lval:0 },
         { id:'nose-off',  action:'Nose Light',              value:'OFF',             lvar:'S_OH_EXT_LT_NOSE', lval:0 },
-        { id:'terr-off',  action:'Terrain On ND',           value:'OFF',             lvar:null },
+        { id:'terr-off',  action:'Terrain On ND',           value:'OFF',             lvar:'I_MIP_GPWS_TERRAIN_ON_ND_CAPT_L', lval:0 },
         { id:'pax-signs', action:'Passenger Signs',         value:'AS REQ',          lvar:null },
       ]
     }]
@@ -852,11 +1034,11 @@ const CHECKLISTS = [
         { id:'nose-on2',  action:'Nose Light',              value:'ON',              lvar:'S_OH_EXT_LT_NOSE', lval:2 },
         { id:'pax-signs2',action:'Passenger Signs',         value:'AS REQ',          lvar:'A_SEATBELTS', lval:1 },
         //{ id:'spd-arm2',  action:'Ground Spoilers',         value:'ARM',             lvar:'A_SPOILERS_ARM', lval:1 },
-        { id:'spoilers',  action:'Ground Spoilers',         value:'ARM',             lvar:'A_FC_SPEEDBRAKE', lval:0, noAutoOnStart: true },
+        { id:'spoilers_', action:'Ground Spoilers',         value:'ARM',             lvar:'A_FC_SPEEDBRAKE', lval:0, noAutoOnStart: true },
         { id:'autobrk2',  action:'AUTO BRK',                value:'SET MED',         lvar:'I_MIP_AUTOBRAKE_MED_L', lval:1 },
         { id:'ecam-ldg',  action:'ECAM MEMO',               value:'LDG NO BLUE',     lvar:null },
       ]
-    }]
+    }]//AUTOBRAKE
   },
   {
     id: 'landing', label: 'LANDING', name: 'LANDING',
@@ -864,9 +1046,16 @@ const CHECKLISTS = [
       title: 'LANDING CHECKS',
       vrefCalculator: true,
       items: [
-        { id:'gear-dn',   action:'Landing Gear',            value:'VERIFY DOWN',     lvar:'S_MIP_GEAR', lval:1 },
-        { id:'flap-full', action:'Flaps',                   value:'VERIFY FULL',     lvar:'S_FC_FLAPS', lval:4 },
-        { id:'ldg-lt2',   action:'Landing Lights',          value:'ON',              lvar:'A_LT_LANDING', lval:1 },
+        //{ id:'app_arm',  action:'app Arm',                 value:'ARM',                lvar:'I_FCU_APPR', lval:1 },
+        { id:'ls_arm',    action:'LS Arm',                  value:'ARM',               lvar:'S_FCU_EFIS1_LS', lval:2 },
+        { id:'loc_arm',   action:'LOC Arm',                 value:'ARM',               lvar:'S_FCU_LOC', lval:2 },
+        { id:'appr_arm',  action:'APPR Arm',                value:'ARM',               lvar:'S_FCU_APPR', lval:2 },
+        //{ id:'ls_arm',      action:'LS Arm',                  value:'ARM',             lvar:'S_FCU_EFIS1_LS',   lgt:0 },
+        //{ id:'loc_arm',     action:'LOC Arm',                 value:'ARM',             lvar:'S_FCU_EFIS1_LOC',  lgt:0 },
+        //{ id:'appr_arm',    action:'APPR Arm',                value:'ARM',             lvar:'S_FCU_EFIS1_APPR', lgt:0 },
+        { id:'gear-dn',     action:'Landing Gear',            value:'VERIFY DOWN',     lvar:'S_MIP_GEAR', lval:1 },
+        { id:'flap-full',   action:'Flaps',                   value:'VERIFY FULL',     lvar:'S_FC_FLAPS', lval:4 },
+        { id:'ldg-lt2',     action:'Landing Lights',          value:'ON',              lvar:'A_LT_LANDING', lval:1 },
       ]
     }]
   },
@@ -875,7 +1064,7 @@ const CHECKLISTS = [
     sections: [{
       title: 'AFTER LANDING',
       items: [
-        { id:'spd-dis2',  action:'Ground Spoilers',         value:'DISARM',          lvar:'A_SPOILERS_ARM', lval:1, noAutoOnStart: true },
+        { id:'spd-dis2',  action:'Ground Spoilers',         value:'DISARM',          lvar:'A_FC_SPEEDBRAKE', lval:1, noAutoOnStart: true },
         { id:'flap-ret2', action:'Flaps',                   value:'RETRACT',         lvar:'S_FC_FLAPS', lval:0 },
         { id:'nose-off2', action:'Nose Light',              value:'OFF',             lvar:'S_OH_EXT_LT_NOSE', lval:0 },
         { id:'ldg-off2',  action:'Landing Lights',          value:'OFF',             lvar:'A_LT_LANDING', lval:0 },
@@ -885,7 +1074,7 @@ const CHECKLISTS = [
         //{ id:'ldg-off',   action:'Landing Lights',          value:'OFF',             lvar:'A_LT_LANDING', lval:0 },
         //{ id:'nose-off',  action:'Nose Light',              value:'OFF',             lvar:'S_OH_EXT_LT_NOSE', lval:0 }
         { id:'ldg-off_',  action:'Landing Lights',          value:'OFF',             lvar:'A_LT_LANDING', lval:0 },
-        { id:'nose-off_', action:'Nose Light',              value:'OFF',             lvar:'S_OH_EXT_LT_NOSE', lval:0 },
+        //{ id:'nose-off_', action:'Nose Light',              value:'OFF',             lvar:'S_OH_EXT_LT_NOSE', lval:0 },
         { id:'apu-bl2',   action:'APU Bleed (nach AVAIL)',  value:'ON',              lvar:'S_OH_PNEUMATIC_APU_BLEED', lval:1 },
       ]
     }]
@@ -894,13 +1083,14 @@ const CHECKLISTS = [
     id: 'parking', label: 'PARKING', name: 'PARKING',
     sections: [{
       title: 'PARKING',
+      paParking: true,
       items: [
         { id:'pk-brk2',   action:'PARK BRK / CHOCKS',       value:'SET',             lvar:'A_PARK_BRAKE', lval:1 },
         //{ id:'eng-off',   action:'ENGINES',                  value:'OFF',             lvar:'A_ENG1_MASTER', lval:0 },
-        { id:'eng1-mst',  action:'ENG 1 Master Switch',     value:'OFF',              lvar:'S_ENG_MASTER_1', lval:1, noAutoOnStart: true },
-        { id:'eng2-mst',  action:'ENG 2 Master Switch',     value:'OFF',              lvar:'S_ENG_MASTER_2', lval:1, noAutoOnStart: true },
-        { id:'wing-off',  action:'WING LIGHTS',              value:'OFF',             lvar:'S_OH_EXT_LT_WING', lval:0 },
-        { id:'fuel-off',  action:'FUEL PUMPS',               value:'OFF',             lvar:'S_OH_FUEL_RIGHT_2', lval:0 },
+        { id:'eng1-mst',  action:'ENG 1 Master Switch',     value:'OFF',             lvar:'S_ENG_MASTER_1', lval:1, noAutoOnStart: true },
+        { id:'eng2-mst',  action:'ENG 2 Master Switch',     value:'OFF',             lvar:'S_ENG_MASTER_2', lval:1, noAutoOnStart: true },
+        { id:'wing-off',  action:'WING LIGHTS',             value:'OFF',             lvar:'S_OH_EXT_LT_WING', lval:0 },
+        { id:'fuel-off',  action:'FUEL PUMPS',              value:'OFF',             lvar:'S_OH_FUEL_RIGHT_2', lval:0 },
       ]
     }]
   },
@@ -934,11 +1124,7 @@ function connectLVars() {
       updateLVarStatus('connected');
       const needed = getAllLVars();
       ws.send(JSON.stringify({ type:'subscribe', lvars: needed }));
-      // Snapshot nach kurzer Verzögerung nehmen (warten bis erste Werte ankommen)
-      setTimeout(() => {
-        takeSnapshot();
-        updateLVarStatus('connected');
-      }, 1500);
+      updateLVarStatus('connected');
     };
     ws.onmessage = (evt) => {
       try {
@@ -967,9 +1153,12 @@ function connectLVars() {
           }
           if (data.type === 'lvar_update') {
           lvarValues = { ...lvarValues, ...data.values };
-          checkAutoItems(); // render() nur wenn sich wirklich was ändert
+          checkAutoItems();
           checkAltitudeWarning();
           checkCallouts();
+          updateGsDisplay();
+          checkGsxBoarding();
+          checkPaAutoTrigger();
         }
       } catch(e) { console.error(e); }
     };
@@ -994,9 +1183,7 @@ function updateLVarStatus(status) {
   dot.className = '';
   if (status === 'connected') {
     dot.classList.add('connected');
-    text.textContent = lvarSnapshot
-      ? 'L-VARs: VERBUNDEN – AUTO-CHECK AKTIV'
-      : 'L-VARs: VERBUNDEN – Snapshot lädt...';
+    text.textContent = 'L-VARs: VERBUNDEN – AUTO-CHECK AKTIV';
     btn.textContent = 'TRENNEN';
     btn.onclick = () => { ws && ws.close(); };
   } else if (status === 'connecting') {
@@ -1019,72 +1206,60 @@ function getAllLVars() {
   CHECKLISTS.forEach(ph => ph.sections.forEach(s => s.items.forEach(i => {
     if (i.lvar) names.add(i.lvar);
   })));
+  names.add('A_GROUNDSPEED'); // Taxi GS-Anzeige (SimVar aus bridge.js)
   return [...names];
 }
 
-// ─── Snapshot System ───
-let lvarSnapshot = null; // Startwerte beim ersten Verbinden
-
+// ─── Kein Snapshot – direkte L-VAR Prüfung ───
 function takeSnapshot() {
-  lvarSnapshot = { ...lvarValues };
-  console.log('[SNAPSHOT] Startwerte gespeichert:', Object.keys(lvarSnapshot).length, 'Variablen');
+  CHECKLISTS.forEach(ph => ph.sections.forEach(s => s.items.forEach(i => {
+    if (state[i.id] === 'auto') state[i.id] = false;
+  })));
 }
 
 function checkAutoItems() {
-  if (!lvarSnapshot) return;
-
   let anyChanged = false;
   CHECKLISTS.forEach(ph => ph.sections.forEach(s => s.items.forEach(i => {
-    if (!i.lvar || (i.lval === null && i.lgt === undefined)) return;
+    if (!i.lvar) return;
     if (!(i.lvar in lvarValues)) return;
-
-    const actual  = Math.round(Number(lvarValues[i.lvar]));
-    const snap    = Math.round(Number(lvarSnapshot[i.lvar] ?? actual));
-    let matches = i.lgt !== undefined ? (actual > i.lgt) : (actual === i.lval);
-    // Doppel-Check: lvar2/lval2
+    const actual = Math.round(Number(lvarValues[i.lvar]));
+    const rawVal = Number(lvarValues[i.lvar]);
+    let matches = i.lgt   !== undefined ? (actual > i.lgt)
+               : i.llt   !== undefined ? (rawVal < i.llt)
+               : i.lnear !== undefined ? (Math.abs(rawVal - i.lnear) <= (i.ltol ?? 1))
+               : i.lodd  !== undefined ? (actual % 2 === 1)
+               : i.leven !== undefined ? (actual % 2 === 0 && actual > 0)
+               : (actual === i.lval);
     if (matches && i.lvar2 && i.lvar2 in lvarValues) {
-      const actual2 = Math.round(Number(lvarValues[i.lvar2]));
-      matches = (actual2 === i.lval2);
+      const raw2 = Number(lvarValues[i.lvar2]);
+      matches = i.llt2  !== undefined ? (raw2 < i.llt2)
+              : i.lnear !== undefined ? (Math.abs(raw2 - i.lnear) <= (i.ltol ?? 1))
+              : (Math.round(raw2) === i.lval2);
     }
-
-    // Item abhaken wenn Sollwert erreicht
     const prevState = state[i.id];
-    // noAutoOnStart: nur abhaken wenn Wert sich seit Snapshot geändert hat
-    if (i.noAutoOnStart && actual === snap) return;
     if (matches && prevState !== 'auto' && prevState !== true) {
       state[i.id] = 'auto';
       updateItemDOM(i.id, 'auto', actual);
       anyChanged = true;
-      // APU Master → 3s Timer für apu-start
       if (i.id === 'apu-mstr') {
         setTimeout(() => {
           if (state['apu-mstr']) {
             state['apu-start'] = true;
-            saveState();
-            render();
+            saveState(); render();
             setTimeout(() => scrollToNextOpen(), 150);
           }
         }, 3000);
       }
-    } else if (!matches && prevState === 'auto') {
-      // Nur zurücksetzen wenn sich der Wert seit Snapshot geändert hat
-      // (verhindert dass Items die beim Start schon falsch waren zurückgesetzt werden)
-      if (actual !== snap) {
-        state[i.id] = false;
-        updateItemDOM(i.id, false, actual);
-        anyChanged = true;
-      }
+    } else if (!matches && prevState === 'auto' && !i.noAutoUncheck) {
+      state[i.id] = false;
+      updateItemDOM(i.id, false, actual);
+      anyChanged = true;
     } else {
       updateItemValue(i.id, actual);
     }
   })));
-  if (anyChanged) {
-    saveState();
-    renderTabs();
-    renderProgress();
-  }
+  if (anyChanged) { saveState(); renderTabs(); renderProgress(); }
 }
-
 // Einzelnes Item im DOM updaten ohne alles neu zu rendern
 function updateItemDOM(id, newState, actualVal) {
   const el = document.getElementById('item-' + id);
@@ -1234,6 +1409,160 @@ function renderVrefSpeeds(sp) {
   `;
 }
 
+function buildPaBoarding() {
+  const box = document.createElement('div');
+  box.style.cssText = 'margin:8px 0 4px;padding:10px 12px;background:#0d1f2d;border:1px solid #1e2e3e;border-radius:6px;';
+  box.innerHTML = `
+    <div style="font-size:9px;color:#5a6a7e;letter-spacing:2px;margin-bottom:8px;">CABIN ANNOUNCEMENT</div>
+
+    <div id="gsx-pax-display" style="
+      display:flex;align-items:center;justify-content:space-between;gap:8px;
+      padding:7px 10px;margin-bottom:10px;border-radius:5px;
+      background:#060f1a;border:1px solid #1e2e3e;">
+      <span style="font-size:11px;color:#5a6a7e;letter-spacing:1px;">PAX BOARDING</span>
+      <span style="font-size:18px;font-weight:bold;color:#c8d6e5;font-family:monospace">--- <span style="font-size:12px;color:#5a6a7e">/ ---</span></span>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:6px;">
+      <button onclick="playPA('BoardingMusic')" style="
+        background:#0a1929;border:1px solid #1e3a5f;color:#c8d6e5;
+        padding:7px 12px;border-radius:5px;font-size:11px;cursor:pointer;
+        display:flex;align-items:center;gap:8px;text-align:left;">
+        <span style="color:#00b4d8;font-size:14px;">▶</span>
+        <span>Boarding Music</span>
+      </button>
+      <button onclick="playPA('BoardingWelcome')" style="
+        background:#0a1929;border:1px solid #1e3a5f;color:#c8d6e5;
+        padding:7px 12px;border-radius:5px;font-size:11px;cursor:pointer;
+        display:flex;align-items:center;gap:8px;text-align:left;">
+        <span style="color:#00b4d8;font-size:14px;">▶</span>
+        <span>Boarding Welcome</span>
+      </button>
+      <button onclick="playPA('BoardingWelcome[Refueling]')" style="
+        background:#0a1929;border:1px solid #1e3a5f;color:#c8d6e5;
+        padding:7px 12px;border-radius:5px;font-size:11px;cursor:pointer;
+        display:flex;align-items:center;gap:8px;text-align:left;">
+        <span style="color:#00b4d8;font-size:14px;">▶</span>
+        <span>Boarding Welcome (Refueling)</span>
+      </button>
+      <button onclick="playPA('BoardingComplete')" style="
+        background:#0a1929;border:1px solid #1e3a5f;color:#c8d6e5;
+        padding:7px 12px;border-radius:5px;font-size:11px;cursor:pointer;
+        display:flex;align-items:center;gap:8px;text-align:left;">
+        <span style="color:#00b4d8;font-size:14px;">▶</span>
+        <span>Boarding Complete</span>
+      </button>
+    </div>
+  `;
+  return box;
+}
+
+let paAudio = null;
+
+// GSX Boarding State
+let _gsxBoardingActive  = false;
+let _gsxPrevPax         = 0;
+
+// PA Auto-Trigger State
+let _paState = {
+  armDoors:       false,  // ArmDoors gespielt
+  safety:         false,  // PreSafetyBriefing + SafetyBriefing gespielt
+  cabinDim:       false,  // CabinDimTakeoff gespielt
+  afterTakeoff:   false,  // AfterTakeoff gespielt
+  seatbelts:      false,  // FastenSeatbelts gespielt (FL100 abwärts)
+  crewSeats:      false,  // CrewSeatsLanding gespielt
+  disarmDoors:    false,  // DisarmDoors gespielt
+  afterLanding:   false,  // AfterLanding gespielt
+};
+let _beaconLast         = 0;
+let _gearUpLast         = 0;
+let _onGroundLast       = true;
+let _paCurrentPhase     = '';
+
+function playPA(name) {
+  const airline = settings.paAirline || 'CFG';
+  const nodePath = require('path');
+  const fs = require('fs');
+  const absPath = nodePath.join(__dirname, '..', 'audio', 'PA', airline, name + '.ogg');
+
+  if (paAudio) { paAudio.pause(); paAudio = null; }
+
+  const ctx = getAudioCtx();
+
+  fs.readFile(absPath, (err, data) => {
+    if (err) { console.warn('[PA] Datei nicht gefunden:', absPath); return; }
+
+    ctx.decodeAudioData(data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength))
+      .then(decoded => {
+        const src = ctx.createBufferSource();
+        src.buffer = decoded;
+
+        // High-pass: entfernt Brummen unter 80Hz
+        const hpf = ctx.createBiquadFilter();
+        hpf.type = 'highpass';
+        hpf.frequency.value = 80;
+        hpf.Q.value = 0.7;
+
+        // Bass Boost: minimal
+        const bass = ctx.createBiquadFilter();
+        bass.type = 'peaking';
+        bass.frequency.value = 250;
+        bass.gain.value = 1;
+        bass.Q.value = 0.8;
+
+        // Low-pass: neutral, volle Höhen
+        const lpf = ctx.createBiquadFilter();
+        lpf.type = 'lowpass';
+        lpf.frequency.value = 8000;
+        lpf.Q.value = 0.7;
+
+        // Presence: aus
+        const presence = ctx.createBiquadFilter();
+        presence.type = 'peaking';
+        presence.frequency.value = 2800;
+        presence.gain.value = 0;
+        presence.Q.value = 1.2;
+
+        // Cabin Reverb: minimal
+        const convolver = ctx.createConvolver();
+        const reverbLen = ctx.sampleRate * 0.3;
+        const reverbBuf = ctx.createBuffer(2, reverbLen, ctx.sampleRate);
+        for (let c = 0; c < 2; c++) {
+          const d = reverbBuf.getChannelData(c);
+          for (let i = 0; i < reverbLen; i++) {
+            d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / reverbLen, 3);
+          }
+        }
+        convolver.buffer = reverbBuf;
+
+        // Dry/Wet Mix: fast trocken
+        const dryGain = ctx.createGain();
+        dryGain.gain.value = 0.92;
+        const wetGain = ctx.createGain();
+        wetGain.gain.value = 0.08;
+
+        // Master Gain — PA Lautstärke aus Einstellungen
+        const masterGain = ctx.createGain();
+        masterGain.gain.value = (settings.paVol ?? 100) / 100;
+
+        src.connect(hpf);
+        hpf.connect(bass);
+        bass.connect(lpf);
+        lpf.connect(presence);
+        presence.connect(dryGain);
+        presence.connect(convolver);
+        convolver.connect(wetGain);
+        dryGain.connect(masterGain);
+        wetGain.connect(masterGain);
+        masterGain.connect(ctx.destination);
+
+        src.start(0);
+        console.log('[PA] Playing:', name);
+      })
+      .catch(e => console.warn('[PA] Decode Fehler:', e));
+  });
+}
+
 function scrollToNextOpen() {
   const phase = CHECKLISTS[currentPhaseIdx];
   // Erstes Item finden das noch nicht erledigt ist
@@ -1269,13 +1598,12 @@ let state = {};
 let currentPhaseIdx = 0;
 
 function initState() {
-  try {
-    const saved = localStorage.getItem('fenix-cl-v2');
-    if (saved) state = JSON.parse(saved);
-  } catch(e) { state = {}; }
+  // Beim App-Start immer komplett zurücksetzen
+  state = {};
   CHECKLISTS.forEach(ph => ph.sections.forEach(s => s.items.forEach(i => {
-    if (!(i.id in state)) state[i.id] = false;
+    state[i.id] = false;
   })));
+  localStorage.setItem('fenix-cl-v2', JSON.stringify(state));
 }
 
 function saveState() {
@@ -1355,6 +1683,25 @@ function renderChecklist() {
   wrap.innerHTML = '';
   const phase = CHECKLISTS[currentPhaseIdx];
 
+  // ── Groundspeed Anzeige im Taxi-Tab ──
+  if (phase.id === 'taxi') {
+    const gs = Math.round(lvarValues["A_GROUNDSPEED"] ?? 0); // m/s → kt
+    const gsDiv = document.createElement('div');
+    gsDiv.id = 'gs-display';
+    gsDiv.style.cssText = `
+      display:flex; align-items:center; justify-content:center; gap:8px;
+      padding:8px 12px; margin-bottom:8px; border-radius:6px;
+      background:#0d1f2d; border:1px solid #1e2e3e; font-family:monospace;
+    `;
+    const color = gs >= 30 ? '#ef4444' : gs >= 25 ? '#eab308' : '#c8d6e5';
+    gsDiv.innerHTML = `
+      <span style="font-size:11px;color:#5a6a7e;letter-spacing:1px;">GROUNDSPEED</span>
+      <span style="font-size:22px;font-weight:bold;color:${color}">${gs}</span>
+      <span style="font-size:11px;color:#5a6a7e;">kt</span>
+    `;
+    wrap.appendChild(gsDiv);
+  }
+
   phase.sections.forEach(sec => {
     const hdr = document.createElement('div');
     hdr.className = 'section-header';
@@ -1364,6 +1711,14 @@ function renderChecklist() {
     // Vref Rechner vor den Items einfügen
     if (sec.vrefCalculator) {
       wrap.appendChild(buildVrefCalculator());
+    }
+
+    if (sec.paBoarding) {
+      wrap.appendChild(buildPaBoarding());
+    }
+
+    if (sec.paParking) {
+      wrap.appendChild(buildPaParking());
     }
 
     sec.items.forEach(item => {
@@ -1459,15 +1814,33 @@ function scrollTabs(dir) {
 let settings = {
   climbWarn: false,
   descentWarn: false,
+  calloutClimb: false,
+  calloutDescent: false,
   autoClose: false,
   autoConnect: true,
   sound: false,
   autoNext: false,
   chrAuto: false,
   callouts: false,
+  // Callout-Gruppen (alle unabhängig vom Master)
+  calloutTakeoff:    true,   // One hundred · V1 · Rotate
+  calloutAfterTO:    true,   // Positive climb · Gear up
+  calloutFlaps:      true,   // Flap 0/1/2/3/Full
+  calloutApproach:   true,   // 1000..10 ft Radioalt
+  calloutApuAlive:   true,   // APU available
+  calloutEngStart:   true,   // Engine 1/2 start
+  calloutEng1Alive:  true,   // Engine 1 alive
+  calloutEng2Alive:  true,   // Engine 2 alive
+  calloutGreeting:   true,   // Good morning/afternoon...
+  paAirline: 'condor',       // PA Airline Set
+  paAuto:    true,           // PA Auto-Trigger
+  paVol:     100,            // PA Lautstärke (0-200%)
   v1: 145,
   vr: 150,
   calloutLang: 'en-US',
+  calloutVol: 100,
+  calloutRate: 0.92,
+  calloutPitch: 1.0,
 };
 
 function resetAllChecklists() {
@@ -1492,17 +1865,34 @@ function closeSettings() {
   document.getElementById('settings-overlay').classList.remove('open');
 }
 function saveSettings() {
-  settings.climbWarn   = document.getElementById('tog-climb').checked;
-  settings.descentWarn = document.getElementById('tog-descent').checked;
+  settings.climbWarn      = document.getElementById('tog-climb').checked;
+  settings.descentWarn    = document.getElementById('tog-descent').checked;
+  settings.calloutClimb   = document.getElementById('tog-callout-climb').checked;
+  settings.calloutDescent = document.getElementById('tog-callout-descent').checked;
   settings.autoClose   = document.getElementById('tog-autoclose').checked;
   settings.autoConnect = document.getElementById('tog-autoconnect').checked;
   settings.sound       = document.getElementById('tog-sound').checked;
   settings.autoNext    = document.getElementById('tog-autonext').checked;
   settings.chrAuto      = document.getElementById('tog-chr').checked;
-  settings.callouts     = document.getElementById('tog-callouts').checked;
+  settings.callouts        = document.getElementById('tog-callouts').checked;
+  settings.calloutTakeoff   = document.getElementById('tog-callout-takeoff').checked;
+  settings.calloutAfterTO   = document.getElementById('tog-callout-afterto').checked;
+  settings.calloutFlaps     = document.getElementById('tog-callout-flaps').checked;
+  settings.calloutApproach  = document.getElementById('tog-callout-approach').checked;
+  settings.calloutApuAlive  = document.getElementById('tog-callout-apu-alive').checked;
+  settings.calloutEngStart  = document.getElementById('tog-callout-eng-start').checked;
+  settings.calloutEng1Alive = document.getElementById('tog-callout-eng1-alive').checked;
+  settings.calloutEng2Alive = document.getElementById('tog-callout-eng2-alive').checked;
+  settings.calloutGreeting  = document.getElementById('tog-callout-greeting').checked;
+  settings.paAirline        = document.getElementById('sel-pa-airline').value;
+  settings.paAuto           = document.getElementById('tog-pa-auto').checked;
+  settings.paVol            = parseInt(document.getElementById('inp-pa-volume').value) || 100;
   settings.v1           = parseInt(document.getElementById('inp-v1').value) || 145;
   settings.vr           = parseInt(document.getElementById('inp-vr').value) || 150;
   settings.calloutLang  = document.getElementById('sel-voice').value;
+  settings.calloutVol   = parseInt(document.getElementById('inp-volume').value) || 100;
+  settings.calloutRate  = parseFloat(document.getElementById('inp-rate').value) || 0.92;
+  settings.calloutPitch = parseFloat(document.getElementById('inp-pitch').value) || 1.0;
   localStorage.setItem('fenix-settings', JSON.stringify(settings));
   // Bridge sofort informieren
   if (ws && ws.readyState === WebSocket.OPEN) {
@@ -1514,17 +1904,42 @@ function loadSettings() {
     const s = JSON.parse(localStorage.getItem('fenix-settings') || '{}');
     settings = { ...settings, ...s };
   } catch(e) {}
-  document.getElementById('tog-climb').checked      = settings.climbWarn;
-  document.getElementById('tog-descent').checked    = settings.descentWarn;
+  document.getElementById('tog-climb').checked           = settings.climbWarn;
+  document.getElementById('tog-descent').checked         = settings.descentWarn;
+  document.getElementById('tog-callout-climb').checked   = settings.calloutClimb ?? false;
+  document.getElementById('tog-callout-descent').checked = settings.calloutDescent ?? false;
   document.getElementById('tog-autoclose').checked  = settings.autoClose;
   document.getElementById('tog-autoconnect').checked= settings.autoConnect;
   document.getElementById('tog-sound').checked      = settings.sound;
   document.getElementById('tog-autonext').checked   = settings.autoNext;
   document.getElementById('tog-chr').checked        = settings.chrAuto ?? false;
-  document.getElementById('tog-callouts').checked   = settings.callouts ?? false;
+  document.getElementById('tog-callouts').checked          = settings.callouts ?? false;
+  document.getElementById('tog-callout-takeoff').checked    = settings.calloutTakeoff  ?? true;
+  document.getElementById('tog-callout-afterto').checked    = settings.calloutAfterTO  ?? true;
+  document.getElementById('tog-callout-flaps').checked      = settings.calloutFlaps    ?? true;
+  document.getElementById('tog-callout-approach').checked   = settings.calloutApproach ?? true;
+  document.getElementById('tog-callout-apu-alive').checked  = settings.calloutApuAlive ?? true;
+  document.getElementById('tog-callout-eng-start').checked  = settings.calloutEngStart ?? true;
+  document.getElementById('tog-callout-eng1-alive').checked = settings.calloutEng1Alive ?? true;
+  document.getElementById('tog-callout-eng2-alive').checked = settings.calloutEng2Alive ?? true;
+  document.getElementById('tog-callout-greeting').checked   = settings.calloutGreeting ?? true;
+  document.getElementById('sel-pa-airline').value           = settings.paAirline ?? 'condor';
+  document.getElementById('tog-pa-auto').checked            = settings.paAuto ?? true;
+  const paVol = settings.paVol ?? 100;
+  document.getElementById('inp-pa-volume').value            = paVol;
+  document.getElementById('pa-vol-label').textContent       = paVol + '%';
   document.getElementById('inp-v1').value           = settings.v1 ?? 145;
   document.getElementById('inp-vr').value           = settings.vr ?? 150;
   document.getElementById('sel-voice').value        = settings.calloutLang ?? 'en-US';
+  const vol = settings.calloutVol ?? 100;
+  document.getElementById('inp-volume').value       = vol;
+  document.getElementById('callout-vol-label').textContent = vol + '%';
+  const rate = settings.calloutRate ?? 0.92;
+  document.getElementById('inp-rate').value         = rate;
+  document.getElementById('callout-rate-label').textContent = rate.toFixed(2);
+  const pitch = settings.calloutPitch ?? 1.0;
+  document.getElementById('inp-pitch').value        = pitch;
+  document.getElementById('callout-pitch-label').textContent = pitch.toFixed(2);
 }
 
 // ─── Audio Engine ───
@@ -1567,6 +1982,17 @@ function playChime(type) {
 // ─── CALLOUT ENGINE ───
 const CALLOUT_FLAP_NAMES = ['Flaps Up', 'Flaps 1', 'Flaps 2', 'Flaps 3', 'Flaps Full'];
 
+// APU Callout Tracking
+let apuCalloutDone = false;
+let _apuAvailLast = -1;
+
+// Engine Start/Alive Tracking
+let engCalloutState = { eng1start:false, eng1alive:false, eng2start:false, eng2alive:false };
+let _engCalloutReady = false;
+let _engMst1Last = -1;
+let _engMst2Last = -1;
+setTimeout(() => { _engCalloutReady = true; }, 3000);
+
 let calloutState = {
   lastFlap:       -1,   // letzte bekannte Klappenstellung
   said100kt:      false,
@@ -1580,6 +2006,22 @@ let calloutState = {
 
 let _calloutSpeaking = false;
 const _calloutQueue   = [];
+let _calloutGainNode  = null;
+let _calloutMediaDest = null;
+
+function getCalloutGain() {
+  if (_calloutGainNode) return _calloutGainNode;
+  const ctx  = getAudioCtx();
+  _calloutMediaDest = ctx.createMediaStreamDestination();
+  _calloutGainNode  = ctx.createGain();
+  _calloutGainNode.connect(_calloutMediaDest);
+  // Stummes Audio-Element das den verstärkten Stream abspielt
+  const boostAudio = new window.Audio();
+  boostAudio.srcObject = _calloutMediaDest.stream;
+  boostAudio.volume = 1.0;
+  boostAudio.play().catch(() => {});
+  return _calloutGainNode;
+}
 
 function calloutSpeak(text) {
   if (!settings.callouts) return;
@@ -1594,9 +2036,16 @@ function processCalloutQueue() {
   showCalloutBanner(text);
   const utt = new SpeechSynthesisUtterance(text);
   utt.lang  = settings.calloutLang ?? 'en-US';
-  utt.rate  = 1.1;
-  utt.pitch = 0.9;
+  utt.rate  = settings.calloutRate  ?? 0.92;
+  utt.pitch = settings.calloutPitch ?? 1.0;
+  // Über 100%: Web Speech auf max, Gain übernimmt den Rest
+  const vol = settings.calloutVol ?? 100;
   utt.volume = 1.0;
+  // GainNode für Verstärkung über 100%
+  try {
+    const gain = getCalloutGain();
+    gain.gain.value = vol / 100;
+  } catch(e) {}
   utt.onend = () => setTimeout(processCalloutQueue, 200);
   utt.onerror = () => setTimeout(processCalloutQueue, 200);
   speechSynthesis.speak(utt);
@@ -1635,11 +2084,11 @@ function checkCallouts() {
   const flap     = lvarValues['S_FC_FLAPS']  ?? 0;
   const onGround = radioAlt < 10 && Math.abs(vs) < 200;
 
-  // ── Flap Callouts (immer) ──
+  // ── Flap Callouts ──
   const flapIdx = Math.round(Number(flap));
   if (calloutState.lastFlap !== -1 && flapIdx !== calloutState.lastFlap) {
     if (flapIdx >= 0 && flapIdx <= 4) {
-      calloutSpeak(CALLOUT_FLAP_NAMES[flapIdx]);
+      if (settings.calloutFlaps) calloutSpeak(CALLOUT_FLAP_NAMES[flapIdx]);
     }
   }
   calloutState.lastFlap = flapIdx;
@@ -1648,15 +2097,15 @@ function checkCallouts() {
   if (onGround || radioAlt < 400) {
     if (!calloutState.said100kt && spd >= 100) {
       calloutState.said100kt = true;
-      calloutSpeak('One hundred');
+      if (settings.calloutTakeoff) calloutSpeak('One hundred');
     }
     if (!calloutState.saidV1 && spd >= (settings.v1 ?? 145)) {
       calloutState.saidV1 = true;
-      calloutSpeak('V1');
+      if (settings.calloutTakeoff) calloutSpeak('V1');
     }
     if (!calloutState.saidRotate && spd >= (settings.vr ?? 150)) {
       calloutState.saidRotate = true;
-      calloutSpeak('Rotate');
+      if (settings.calloutTakeoff) calloutSpeak('Rotate');
     }
   }
 
@@ -1664,11 +2113,11 @@ function checkCallouts() {
   if (!onGround && radioAlt > 10 && radioAlt < 400) {
     if (!calloutState.saidPositive && vs > 200) {
       calloutState.saidPositive = true;
-      calloutSpeak('Positive climb');
+      if (settings.calloutAfterTO) calloutSpeak('Positive climb');
     }
     if (!calloutState.saidGearUp && calloutState.saidPositive && gear === 0) {
       calloutState.saidGearUp = true;
-      calloutSpeak('Gear up');
+      if (settings.calloutAfterTO) calloutSpeak('Gear up');
     }
   }
 
@@ -1678,10 +2127,41 @@ function checkCallouts() {
     for (const alt of approachCallouts) {
       if (radioAlt <= alt && calloutState.lastRadioCallout > alt) {
         calloutState.lastRadioCallout = alt;
-        calloutSpeak(String(alt));
+        if (settings.calloutApproach) calloutSpeak(String(alt));
         break;
       }
     }
+  }
+
+  // ── APU Available Callout ──
+  {
+    const apuAvail  = lvarValues['I_OH_ELEC_APU_START_U'] ?? 0;
+    const apuMaster = lvarValues['I_OH_ELEC_APU_MASTER_L'] ?? 0;
+    if (!apuCalloutDone && _apuAvailLast === 0 && apuAvail === 1) {
+      apuCalloutDone = true;
+      if (settings.calloutApuAlive) calloutSpeak('APU available');
+      state['apu-avail'] = 'auto'; saveState(); render();
+    }
+    _apuAvailLast = apuAvail;
+    if (apuMaster === 0) { apuCalloutDone = false; }
+  }
+
+  // ── Engine Start / Alive Callouts ──
+  {
+    const n2_1 = lvarValues['A_ENG1_N2']      ?? 0;
+    const n2_2 = lvarValues['A_ENG2_N2']      ?? 0;
+    const mst1 = lvarValues['S_ENG_MASTER_1'] ?? 1;
+    const mst2 = lvarValues['S_ENG_MASTER_2'] ?? 1;
+    if (!_engCalloutReady) { _engMst1Last = mst1; _engMst2Last = mst2; return; }
+    if (!engCalloutState.eng2start && _engMst2Last === 1 && mst2 === 0) { engCalloutState.eng2start = true; if (settings.calloutEngStart)  calloutSpeak('Engine 2 start'); }
+    if (!engCalloutState.eng2alive && n2_2 > 58)                        { engCalloutState.eng2alive = true; if (settings.calloutEng2Alive) calloutSpeak('Engine 2 alive'); state['eng2-mon'] = 'auto'; state['eng2-alv'] = 'auto'; saveState(); render(); }
+    if (!engCalloutState.eng1start && _engMst1Last === 1 && mst1 === 0) { engCalloutState.eng1start = true; if (settings.calloutEngStart)  calloutSpeak('Engine 1 start'); }
+    if (!engCalloutState.eng1alive && n2_1 > 58)                        { engCalloutState.eng1alive = true; if (settings.calloutEng1Alive) calloutSpeak('Engine 1 alive'); state['eng1-mon'] = 'auto'; state['eng1-alv'] = 'auto'; saveState(); render(); }
+    if (mst1 === 1 && mst2 === 1 && (engCalloutState.eng1start || engCalloutState.eng2start)) {
+      engCalloutState = { eng1start:false, eng1alive:false, eng2start:false, eng2alive:false };
+    }
+    _engMst1Last = mst1;
+    _engMst2Last = mst2;
   }
 
   // ── Reset nach Landung ──
@@ -1720,6 +2200,159 @@ function get100ftBucket(alt) {
   return Math.floor(alt / 100) * 100;
 }
 
+function checkGsxBoarding() {
+  const paxBoarding = lvarValues['FSDT_GSX_NUMPASSENGERS_BOARDING'] ?? 0;
+  const paxTotal    = lvarValues['FSDT_GSX_NUMPASSENGERS']          ?? 0;
+
+  // Boarding START: Pax springt von 0 auf > 0
+  if (!_gsxBoardingActive && paxBoarding > 0) {
+    _gsxBoardingActive = true;
+    _gsxPrevPax = paxBoarding;
+    if (settings.paAuto) playPA('BoardingWelcome');
+    console.log('[GSX] Boarding gestartet → BoardingWelcome');
+  }
+
+  // Boarding COMPLETE: boardende Pax >= Ziel
+  if (_gsxBoardingActive && paxTotal > 0 && paxBoarding >= paxTotal && _gsxPrevPax < paxTotal) {
+    _gsxPrevPax = paxBoarding;
+    if (settings.paAuto) playPA('BoardingComplete');
+    console.log('[GSX] Boarding complete → BoardingComplete');
+  }
+
+  // Reset wenn Boarding wieder auf 0
+  if (_gsxBoardingActive && paxBoarding === 0) {
+    _gsxBoardingActive = false;
+    _gsxPrevPax = 0;
+  }
+
+  _gsxPrevPax = paxBoarding;
+  updatePaxDisplay(paxBoarding, paxTotal);
+}
+
+function checkPaAutoTrigger() {
+  if (!settings.paAuto) return;
+
+  const beacon   = lvarValues['A_LT_BEACON']  ?? 0;
+  const alt      = lvarValues['A_ALT']        ?? 0;
+  const vs       = lvarValues['A_VS']         ?? 0;
+  const radioAlt = lvarValues['A_RADIO_ALT']  ?? 9999;
+  const gear     = lvarValues['S_MIP_GEAR']   ?? 0;
+  const onGround = radioAlt < 10 && Math.abs(vs) < 100;
+  const phase    = CHECKLISTS[currentPhaseIdx]?.id ?? '';
+
+  // ── ArmDoors → BEACON geht AN ──
+  if (!_paState.armDoors && _beaconLast === 0 && beacon === 1) {
+    _paState.armDoors = true;
+    playPA('ArmDoors');
+    setTimeout(() => {
+      if (!settings.paAuto) return;
+      const t = lvarValues['A_LOCAL_TIME'] ?? 0;
+      const h = Math.floor((t % 86400) / 3600);
+      let tod = 'MORNING';
+      if (h >= 12 && h < 17) tod = 'AFTERNOON';
+      else if (h >= 17 && h < 21) tod = 'EVENING';
+      else if (h >= 21 || h < 5) tod = 'NIGHT';
+      playPA(`PreSafetyBriefing[${tod}]`);
+    }, 3000);
+  }
+  _beaconLast = beacon;
+
+  // ── SafetyBriefing → Taxi-Phase wird aktiv ──
+  if (!_paState.safety && phase === 'taxi') {
+    _paState.safety = true;
+    playPA('SafetyBriefing');
+  }
+
+  // ── CabinDimTakeoff → Lineup-Phase wird aktiv ──
+  if (!_paState.cabinDim && phase === 'lineup') {
+    _paState.cabinDim = true;
+    playPA('CabinDimTakeoff');
+  }
+
+  // ── AfterTakeoff → Gear UP nach Abheben ──
+  if (!_paState.afterTakeoff && !onGround && radioAlt > 100 && gear === 0 && _gearUpLast !== 0) {
+    _paState.afterTakeoff = true;
+    playPA('AfterTakeoff');
+  }
+  _gearUpLast = gear;
+
+  // ── FastenSeatbelts → Sinken durch FL100 ──
+  if (!_paState.seatbelts && !onGround && alt < 10000 && vs < -200 && _paState.afterTakeoff) {
+    _paState.seatbelts = true;
+    playPA('FastenSeatbelts');
+    setTimeout(() => { if (settings.paAuto) playPA('DescentSeatbelts'); }, 8000);
+  }
+
+  // ── CrewSeatsLanding → Radioalt < 1000 ft sinkend ──
+  if (!_paState.crewSeats && !onGround && radioAlt < 1000 && radioAlt > 50 && vs < -100) {
+    _paState.crewSeats = true;
+    playPA('CrewSeatsLanding');
+  }
+
+  // ── AfterLanding → Touchdown ──
+  if (!_paState.afterLanding && onGround && !_onGroundLast && _paState.afterTakeoff) {
+    _paState.afterLanding = true;
+    setTimeout(() => { if (settings.paAuto) playPA('AfterLanding'); }, 15000);
+  }
+
+  // ── DisarmDoors → Parking-Phase wird aktiv ──
+  if (!_paState.disarmDoors && phase === 'parking') {
+    _paState.disarmDoors = true;
+    playPA('DisarmDoors');
+  }
+
+  // Reset für neuen Flug
+  if (phase === 'cockpit-prep-1' && _paState.afterLanding) {
+    _paState = { armDoors:false, safety:false, cabinDim:false, afterTakeoff:false,
+                 seatbelts:false, crewSeats:false, disarmDoors:false, afterLanding:false };
+    _beaconLast = 0; _gearUpLast = 0;
+  }
+
+  _onGroundLast = onGround;
+}
+
+function buildPaParking() {
+  const box = document.createElement('div');
+  box.style.cssText = 'margin:8px 0 4px;padding:10px 12px;background:#0d1f2d;border:1px solid #1e2e3e;border-radius:6px;';
+  box.innerHTML = `
+    <div style="font-size:9px;color:#5a6a7e;letter-spacing:2px;margin-bottom:8px;">CABIN ANNOUNCEMENT</div>
+    <div style="display:flex;flex-direction:column;gap:6px;">
+      <button onclick="playPA('DisembarkStarted')" style="
+        background:#0a1929;border:1px solid #1e3a5f;color:#c8d6e5;
+        padding:7px 12px;border-radius:5px;font-size:11px;cursor:pointer;
+        display:flex;align-items:center;gap:8px;text-align:left;">
+        <span style="color:#00b4d8;font-size:14px;">▶</span>
+        <span>Disembark Started</span>
+      </button>
+    </div>
+  `;
+  return box;
+}
+
+function updatePaxDisplay(boarded, total) {
+  const el = document.getElementById('gsx-pax-display');
+  if (!el) return;
+  const pct = total > 0 ? Math.round((boarded / total) * 100) : 0;
+  const color = boarded >= total && total > 0 ? '#22c55e' : '#c8d6e5';
+  el.innerHTML = `
+    <span style="font-size:11px;color:#5a6a7e;letter-spacing:1px;">PAX BOARDING</span>
+    <span style="font-size:18px;font-weight:bold;color:${color};font-family:monospace">${boarded}<span style="font-size:12px;color:#5a6a7e"> / ${total > 0 ? total : '---'}</span></span>
+    ${total > 0 ? `<span style="font-size:10px;color:${color}">${pct}%</span>` : ''}
+  `;
+}
+
+function updateGsDisplay() {
+  const el = document.getElementById('gs-display');
+  if (!el) return;
+  const gs = Math.round(lvarValues["A_GROUNDSPEED"] ?? 0);
+  const color = gs >= 30 ? '#ef4444' : gs >= 25 ? '#eab308' : '#c8d6e5';
+  el.innerHTML = `
+    <span style="font-size:11px;color:#5a6a7e;letter-spacing:1px;">GROUNDSPEED</span>
+    <span style="font-size:22px;font-weight:bold;color:${color}">${gs}</span>
+    <span style="font-size:11px;color:#5a6a7e;">kt</span>
+  `;
+}
+
 function checkAltitudeWarning() {
   if (!wsConnected) return;
   const alt = lvarValues['A_ALT'] ?? 0;
@@ -1744,6 +2377,7 @@ function checkAltitudeWarning() {
       warn.className = 'climb';
       warn.innerHTML = `↑ ${bucket.toLocaleString()} ft – LANDING LIGHTS OFF · NOSE OFF`;
       playChime('climb');
+      if (settings.calloutClimb) calloutSpeak('Ten thousand feet, lights off');
       startAutoClose();
     }
   }
@@ -1754,6 +2388,7 @@ function checkAltitudeWarning() {
       warn.className = 'descent';
       warn.innerHTML = `↓ ${bucket.toLocaleString()} ft – LANDING LIGHTS ON · NOSE ON`;
       playChime('descent');
+      if (settings.calloutDescent) calloutSpeak('Ten thousand feet, lights on');
       startAutoClose();
     }
   }
@@ -1792,6 +2427,27 @@ function toggleCollapse() {
 }
 
 loadSettings();
+
+// ─── PA Airline Dropdown befüllen ────────────────────────────────
+async function initPaAirlineSelect() {
+  const sel = document.getElementById('sel-pa-airline');
+  if (!sel || !window.electronAPI?.getPaAirlines) return;
+  try {
+    const airlines = await window.electronAPI.getPaAirlines();
+    if (!airlines || airlines.length === 0) return;
+    sel.innerHTML = '';
+    airlines.forEach(name => {
+      const opt = document.createElement('option');
+      opt.value = name;
+      opt.textContent = name.charAt(0).toUpperCase() + name.slice(1);
+      if (name === (settings.paAirline || 'condor')) opt.selected = true;
+      sel.appendChild(opt);
+    });
+  } catch(e) {
+    console.warn('[PA] Airline-Ordner konnten nicht geladen werden:', e);
+  }
+}
+initPaAirlineSelect();
 
 // ─── Shortcut Recorder ───────────────────────────────────────────
 let _scRecording = false;
@@ -1856,6 +2512,42 @@ function startShortcutRecording() {
 initShortcutDisplay();
 initState();
 render();
+
+// ─── Begrüßung durch Copiloten ───
+function playGreeting() {
+  if (!settings.calloutGreeting) return;
+  const simSeconds = lvarValues['A_LOCAL_TIME'];
+  let hour;
+  if (simSeconds !== undefined && simSeconds > 0) {
+    hour = Math.floor(simSeconds / 3600) % 24;
+  } else {
+    hour = new Date().getHours();
+  }
+  let greeting;
+  if (hour >= 5 && hour < 12)       greeting = 'Good morning Captain, welcome aboard';
+  else if (hour >= 12 && hour < 18) greeting = 'Good afternoon Captain, welcome aboard';
+  else if (hour >= 18 && hour < 22) greeting = 'Good evening Captain, welcome aboard';
+  else                               greeting = 'Good night Captain, welcome aboard';
+  calloutSpeak(greeting);
+}
+let _greetingDone = false;
+// Warten bis A_LOCAL_TIME wirklich einen sinnvollen Wert hat
+const _greetingInterval = setInterval(() => {
+  const t = lvarValues['A_LOCAL_TIME'];
+  if (!_greetingDone && t !== undefined && t > 0) {
+    _greetingDone = true;
+    clearInterval(_greetingInterval);
+    setTimeout(playGreeting, 500);
+  }
+}, 500);
+// Fallback nach 10 Sekunden mit PC-Zeit
+setTimeout(() => {
+  if (!_greetingDone) {
+    _greetingDone = true;
+    clearInterval(_greetingInterval);
+    playGreeting();
+  }
+}, 10000);
 // Automatisch verbinden versuchen beim Start
 if (settings.autoConnect) setTimeout(() => {
   connectLVars();
